@@ -1032,8 +1032,8 @@ let estado = JSON.parse(JSON.stringify(DEFAULT));
 function statusMsg(t){ const e=document.getElementById('cstatus'); if(e){ e.textContent=t; if(t) setTimeout(()=>{ if(e.textContent===t) e.textContent=''; },2500);} }
 
 const SYNC = {
-  url:  '',                        // <-- pega aqui la URL de tu base de datos
-  sala: 'casa-gandia'              // <-- cambia esto por algo solo vuestro
+  url:  'https://menu-casa-eacd2-default-rtdb.europe-west1.firebasedatabase.app',
+  sala: 'cano-gandia8422'
 };
 
 const base = () => SYNC.url.replace(/\/+$/,'') + '/' + SYNC.sala;
