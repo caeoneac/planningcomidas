@@ -1,0 +1,1478 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#F5F7F1">
+<meta name="description" content="Menu semanal, ensaladas, horno del domingo, compra por supermercado y gasto estimado.">
+<title>Planificador semanal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Petrona:ital,wght@0,400;0,600;0,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+</head>
+<body>
+<style>
+:root{
+  --ground:#F5F7F1; --surface:#FFFFFF; --surface-2:#EDF0E8; --surface-3:#E3E8DC;
+  --ink:#1B211A; --ink-2:#3D4A3B; --muted:#65735F;
+  --hairline:#DBE1D3; --hairline-2:#C8D1BE;
+  --accent:#3E5C46; --accent-soft:#E2EBDD; --accent-ink:#FFFFFF;
+  --carga:#9C5C16; --carga-soft:#F6E9D8;
+  --ella:#4A5E86; --ella-soft:#E1E7F2;
+  --flex:#7E4E5A; --flex-soft:#F3E4E6;
+  --pez:#2F6E74; --pez-soft:#DDEDEE;
+  --carne:#8C4A3A; --carne-soft:#F5E4E0;
+  --shadow:0 1px 2px rgba(27,33,26,.05), 0 8px 24px -16px rgba(27,33,26,.22);
+  --f-display:"Petrona", Georgia, serif;
+  --f-body:"IBM Plex Sans", system-ui, -apple-system, sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#12150F; --surface:#1A1E17; --surface-2:#222719; --surface-3:#2A3021;
+    --ink:#E9EDE2; --ink-2:#C3CCB9; --muted:#94A08B;
+    --hairline:#2C3327; --hairline-2:#3A4334;
+    --accent:#96BC9B; --accent-soft:#22301F; --accent-ink:#12150F;
+    --carga:#DCA463; --carga-soft:#332616;
+    --ella:#9DB3DA; --ella-soft:#1E2536;
+    --flex:#CE9AA5; --flex-soft:#33222A;
+    --pez:#7FBFC6; --pez-soft:#16292B;
+    --carne:#D99282; --carne-soft:#2E1D19;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#12150F; --surface:#1A1E17; --surface-2:#222719; --surface-3:#2A3021;
+  --ink:#E9EDE2; --ink-2:#C3CCB9; --muted:#94A08B;
+  --hairline:#2C3327; --hairline-2:#3A4334;
+  --accent:#96BC9B; --accent-soft:#22301F; --accent-ink:#12150F;
+  --carga:#DCA463; --carga-soft:#332616;
+  --ella:#9DB3DA; --ella-soft:#1E2536;
+  --flex:#CE9AA5; --flex-soft:#33222A;
+  --pez:#7FBFC6; --pez-soft:#16292B;
+  --carne:#D99282; --carne-soft:#2E1D19;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-family:var(--f-display);margin:0;text-wrap:balance}
+p{margin:0}
+button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
+input{font-family:inherit;font-size:inherit;color:inherit}
+
+/* ---------- barra superior ---------- */
+.topbar{position:sticky;top:0;z-index:30;background:var(--surface);border-bottom:1px solid var(--hairline-2)}
+.topinner{max-width:1000px;margin:0 auto;padding:10px clamp(14px,3vw,28px)}
+.titlerow{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.titlerow h1{font-size:1.25rem;font-weight:700;letter-spacing:-.01em;margin-right:auto}
+.weeknav{display:flex;align-items:center;gap:2px;border:1px solid var(--hairline-2);border-radius:3px;overflow:hidden}
+.weeknav button{background:var(--surface);border:none;padding:5px 11px;color:var(--muted);line-height:1}
+.weeknav button:hover{background:var(--surface-2);color:var(--ink)}
+.weeknav .wlabel{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:6px 10px;background:var(--surface-2);color:var(--ink);white-space:nowrap}
+.tabs{display:flex;gap:2px;margin-top:10px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{background:transparent;border:none;border-bottom:2px solid transparent;padding:8px 14px;color:var(--muted);font-weight:500;white-space:nowrap}
+.tab[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
+.tab:hover{color:var(--ink)}
+
+.wrap{max-width:1000px;margin:0 auto;padding:26px clamp(14px,3vw,28px) 90px}
+.panel[hidden]{display:none}
+
+/* ---------- utilidades ---------- */
+.eyebrow{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.lede{margin-top:12px;max-width:68ch;color:var(--ink-2)}
+h2.sec{font-size:1.4rem;font-weight:600;padding-bottom:10px;border-bottom:1px solid var(--hairline-2);margin-top:38px}
+h2.sec:first-child{margin-top:0}
+.n{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.btn{background:var(--surface);border:1px solid var(--hairline-2);border-radius:3px;padding:7px 14px;font-size:.87rem;font-weight:500}
+.btn:hover{background:var(--surface-2)}
+.btn.pri{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.pri:hover{filter:brightness(1.08)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.status{font-size:.8rem;color:var(--muted);font-family:var(--f-mono)}
+.sincst{font-family:var(--f-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);border:1px solid var(--hairline-2);border-radius:2px;padding:4px 8px;white-space:nowrap}
+
+/* ---------- cuadrante ---------- */
+.quad{margin-top:20px;background:var(--surface);border:1.5px solid var(--ink);border-radius:2px;overflow:hidden}
+.quad-head{padding:18px 20px 14px;text-align:center;border-bottom:1.5px solid var(--ink)}
+.quad-head h3{font-size:1.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.quad-head p{font-family:var(--f-display);font-style:italic;color:var(--muted);margin-top:1px}
+.qscroll{overflow-x:auto}
+table.cuad{width:100%;border-collapse:collapse;min-width:620px}
+table.cuad th,table.cuad td{border:1px solid var(--hairline-2);padding:10px 12px;vertical-align:top;text-align:left}
+table.cuad thead th{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:400;text-align:center;background:var(--surface-2)}
+table.cuad thead th:first-child{width:128px}
+table.cuad tbody th{font-family:var(--f-display);font-size:1.08rem;font-weight:600;background:var(--surface-2);white-space:nowrap}
+table.cuad tbody th span{display:block;font-family:var(--f-body);font-size:.68rem;font-weight:400;line-height:1.3;margin-top:3px;color:var(--muted);white-space:normal}
+table.cuad td{font-size:.86rem;line-height:1.4}
+table.cuad td b{font-weight:600}
+.pill{display:inline-block;font-family:var(--f-mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:2px;margin-top:5px}
+.pill.pez{background:var(--pez-soft);color:var(--pez)}
+.pill.carne{background:var(--carne-soft);color:var(--carne)}
+.pill.huevo{background:var(--carga-soft);color:var(--carga)}
+.pill.h{background:var(--carga-soft);color:var(--carga)}
+.pill.m{background:var(--ella-soft);color:var(--ella)}
+.quad-foot{padding:10px 14px;border-top:1px solid var(--hairline-2);font-size:.76rem;color:var(--muted);text-align:center}
+
+/* ---------- días ---------- */
+.day{background:var(--surface);border:1px solid var(--hairline);border-radius:3px;box-shadow:var(--shadow);margin-top:14px;overflow:hidden}
+.day-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 14px;padding:12px 18px;border-bottom:1px solid var(--hairline);background:var(--surface-2)}
+.day-head h3{font-size:1.18rem;font-weight:700;margin-right:auto}
+.tag{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:2px;white-space:nowrap}
+.tag.h{background:var(--carga-soft);color:var(--carga)}
+.tag.m{background:var(--ella-soft);color:var(--ella)}
+.tag.d{background:var(--accent-soft);color:var(--accent)}
+.meal{display:grid;grid-template-columns:88px 1fr;gap:0 16px;padding:16px 18px;border-top:1px solid var(--hairline)}
+.meal:first-of-type{border-top:none}
+.slot{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding-top:4px}
+.slot em{display:block;font-style:normal;letter-spacing:0;text-transform:none;font-family:var(--f-body);font-size:.78rem;margin-top:3px}
+.slot em.pez{color:var(--pez)}
+.slot em.carne{color:var(--carne)}
+.slot em.huevo{color:var(--carga)}
+.dish{font-family:var(--f-display);font-size:1.05rem;font-weight:600;line-height:1.3}
+.detail{margin-top:7px;font-size:.88rem;color:var(--ink-2)}
+.detail b{font-weight:600;color:var(--ink)}
+.note{margin-top:7px;font-size:.82rem;color:var(--muted)}
+.starch{margin-top:8px;font-size:.83rem;padding:6px 10px;border-radius:2px;background:var(--carga-soft);color:var(--carga)}
+.starch.m{background:var(--ella-soft);color:var(--ella)}
+.starch.both{background:var(--accent-soft);color:var(--accent)}
+.starch.none{background:var(--surface-2);color:var(--muted)}
+.prot{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.pchip{display:inline-flex;gap:5px;align-items:baseline;border:1px solid var(--hairline-2);border-radius:2px;padding:2px 8px;font-size:.75rem;color:var(--muted)}
+.pchip strong{font-family:var(--f-mono);font-size:.82rem;font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
+
+
+/* ---------- segmentos y supermercados ---------- */
+.segs{display:inline-flex;border:1px solid var(--hairline-2);border-radius:3px;overflow:hidden}
+.seg{background:var(--surface);border:none;border-right:1px solid var(--hairline-2);padding:7px 15px;font-size:.87rem;font-weight:500;color:var(--muted)}
+.seg:last-child{border-right:none}
+.seg[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.seg:hover:not([aria-pressed="true"]){background:var(--surface-2);color:var(--ink)}
+
+.item{display:grid;grid-template-columns:22px 1fr auto auto;gap:10px 12px;align-items:start;padding:10px 16px;border-top:1px solid var(--hairline)}
+.item select{
+  font-family:var(--f-body);font-size:.79rem;color:var(--ink);background:var(--surface);
+  border:1px solid var(--hairline-2);border-radius:3px;padding:3px 6px;max-width:150px;cursor:pointer;
+}
+.item select[data-set="1"]{border-color:var(--accent);color:var(--accent);font-weight:500}
+.item select:focus{outline:2px solid var(--accent);outline-offset:-1px}
+@media (max-width:620px){
+  .item{grid-template-columns:22px 1fr;gap:6px 10px}
+  .item .qty{grid-column:2}
+  .item select{grid-column:2;max-width:none;width:100%}
+}
+
+.superblk{background:var(--surface);border:1px solid var(--hairline);border-radius:3px;margin-top:14px;overflow:hidden}
+.superblk .sh{display:flex;align-items:center;gap:10px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--hairline)}
+.superblk .sh h3{font-size:1.05rem;font-weight:600;margin-right:auto}
+.superblk .sh .cnt{font-family:var(--f-mono);font-size:.78rem;color:var(--muted)}
+.superblk .grp{padding:4px 16px 2px;font-family:var(--f-mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:6px}
+.superblk .li{display:grid;grid-template-columns:22px 1fr auto;gap:12px;align-items:start;padding:7px 16px}
+.superblk .li input[type=checkbox]{width:17px;height:17px;margin:2px 0 0;accent-color:var(--accent);cursor:pointer}
+.superblk .li label{font-size:.89rem;cursor:pointer}
+.superblk .li.done label{text-decoration:line-through;color:var(--muted)}
+.superblk .li .qty{font-family:var(--f-mono);font-size:.82rem;color:var(--accent);white-space:nowrap}
+.superblk .sf{padding:10px 16px;border-top:1px solid var(--hairline);display:flex;gap:8px;flex-wrap:wrap}
+.empty{background:var(--surface);border:1px dashed var(--hairline-2);border-radius:3px;padding:22px 20px;margin-top:14px;color:var(--muted);font-size:.9rem}
+.tot{margin-top:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--hairline);border:1px solid var(--hairline);border-radius:3px;overflow:hidden}
+.tot div{background:var(--surface);padding:12px 15px}
+.tot dt{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.tot dd{margin:0;font-family:var(--f-display);font-size:1.3rem;font-weight:700;font-variant-numeric:tabular-nums}
+
+/* ---------- compra ---------- */
+.cat{background:var(--surface);border:1px solid var(--hairline);border-radius:3px;margin-top:14px;overflow:hidden}
+.cat-head{display:flex;align-items:center;gap:10px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--hairline)}
+.cat-head h3{font-size:1.05rem;font-weight:600;margin-right:auto}
+.cat-head .cnt{font-family:var(--f-mono);font-size:.78rem;color:var(--muted)}
+.item:first-child{border-top:none}
+.item input[type=checkbox]{width:17px;height:17px;margin:3px 0 0;accent-color:var(--accent);cursor:pointer}
+.item label{cursor:pointer;font-size:.9rem}
+.item.done label{text-decoration:line-through;color:var(--muted)}
+.item .qty{font-family:var(--f-mono);font-size:.83rem;color:var(--accent);white-space:nowrap;font-variant-numeric:tabular-nums;padding-top:1px}
+.item .why{display:block;font-size:.76rem;color:var(--muted);margin-top:2px}
+.alt{margin-top:6px;font-size:.8rem;color:var(--muted);padding:0 16px 12px}
+
+/* ---------- gasto ---------- */
+table.gasto{width:100%;border-collapse:collapse;background:var(--surface);font-size:.9rem;min-width:460px}
+table.gasto th,table.gasto td{text-align:left;padding:9px 14px;border-bottom:1px solid var(--hairline)}
+table.gasto thead th{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);background:var(--surface-2);font-weight:400}
+table.gasto td.num{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+table.gasto tfoot td{font-weight:700;border-top:2px solid var(--hairline-2);border-bottom:none;background:var(--surface-2)}
+.price{width:88px;text-align:right;background:var(--surface);border:1px solid var(--hairline-2);border-radius:3px;padding:4px 7px;font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.price:focus{outline:2px solid var(--accent);outline-offset:-1px}
+.scroller{overflow-x:auto;border:1px solid var(--hairline);border-radius:3px;margin-top:16px}
+.bigfig{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1px;background:var(--hairline);border:1px solid var(--hairline);border-radius:3px;margin-top:18px;overflow:hidden}
+.bigfig div{background:var(--surface);padding:14px 16px}
+.bigfig dt{font-family:var(--f-mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.bigfig dd{margin:0;font-family:var(--f-display);font-size:1.5rem;font-weight:700;font-variant-numeric:tabular-nums}
+.bigfig dd small{display:block;font-family:var(--f-body);font-size:.75rem;font-weight:400;color:var(--muted);margin-top:3px}
+
+/* ---------- sugerencias ---------- */
+.cols{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--hairline);border-radius:3px;padding:16px 18px}
+.card h4{font-size:1rem;font-weight:600;margin-bottom:9px}
+.card .sub{font-size:.79rem;color:var(--muted);margin:-5px 0 10px}
+.card ul{margin:0;padding-left:17px;display:grid;gap:6px}
+.card li{font-size:.86rem;color:var(--ink-2)}
+.card li b{color:var(--ink);font-weight:600}
+.card.ok{border-left:3px solid var(--accent)}
+.card.no{border-left:3px solid var(--carne)}
+table.data{width:100%;border-collapse:collapse;background:var(--surface);font-size:.87rem;min-width:440px}
+table.data th,table.data td{text-align:left;padding:9px 14px;border-bottom:1px solid var(--hairline);vertical-align:top}
+table.data thead th{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);background:var(--surface-2);font-weight:400}
+table.data tbody tr:last-child td{border-bottom:none}
+table.data td.n{font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+
+@media (max-width:560px){
+  .meal{grid-template-columns:1fr;gap:6px}
+  .slot{padding-top:0}
+  .slot em{display:inline;margin-left:6px}
+}
+
+@media print{
+  body{background:#fff;color:#000}
+  .topbar,.wrap>.row,.panel:not(#p-menu),.printhide{display:none !important}
+  .wrap{padding:0;max-width:none}
+  .day,h2.sec,.lede,.eyebrow{display:none !important}
+  .quad{border-color:#000;box-shadow:none;margin:0;page-break-inside:avoid}
+  table.cuad{min-width:0}
+  table.cuad th,table.cuad td{border-color:#999}
+  table.cuad thead th,table.cuad tbody th{background:#f2f2f2}
+}
+</style>
+
+<div class="topbar">
+  <div class="topinner">
+    <div class="titlerow">
+      <h1>Planificador semanal</h1>
+      <div class="weeknav">
+        <button id="wprev" title="Semana anterior">‹</button>
+        <span class="wlabel" id="wlabel">Semana impar · cocido</span>
+        <button id="wnext" title="Semana siguiente">›</button>
+      </div>
+      <button class="btn" id="btnprint">Imprimir cuadrante</button>
+      <span class="sincst" id="sincst">Conectando...</span>
+    </div>
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" data-tab="menu" aria-selected="true">Menú</button>
+      <button class="tab" role="tab" data-tab="ensaladas" aria-selected="false">Ensaladas</button>
+      <button class="tab" role="tab" data-tab="compra" aria-selected="false">Compra</button>
+      <button class="tab" role="tab" data-tab="domingo" aria-selected="false">Domingo</button>
+      <button class="tab" role="tab" data-tab="sugerencias" aria-selected="false">Sugerencias</button>
+      <button class="tab" role="tab" data-tab="gasto" aria-selected="false">Gasto</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- ================= MENÚ ================= -->
+<section class="panel" id="p-menu">
+  <p class="eyebrow">Comidas y cenas · dos personas</p>
+  <p class="lede">Los dos coméis el mismo plato todos los días: lo que cambia es la cantidad, según quién haya entrenado. Cada día combina carne y pescado, salvo las dos noches de huevo. Cada crema se hace el primer día que toca y cubre dos noches. Todo a la plancha salvo las sardinas del martes, la patata del viernes, la pizza y los guisos de olla exprés.</p>
+
+  <div class="quad">
+    <div class="quad-head"><h3>Menú semanal</h3><p>¿qué comemos hoy?</p></div>
+    <div class="qscroll">
+      <table class="cuad">
+        <thead><tr><th></th><th>Comida</th><th>Cena</th></tr></thead>
+        <tbody id="cuadbody"></tbody>
+      </table>
+    </div>
+    <div class="quad-foot">Los dos coméis lo mismo cada día: cambia la cantidad, no el plato · aperitivo de grana padano o boquerones antes de comer · magnesio dos horas después de cenar · frutos rojos solo en el desayuno</div>
+  </div>
+
+  <h2 class="sec">Los siete días, con gramajes</h2>
+  <div id="dias"></div>
+</section>
+
+<!-- ================= COMPRA ================= -->
+<section class="panel" id="p-ensaladas" hidden>
+  <p class="eyebrow">Las cuatro ensaladas</p>
+  <p class="lede">Uno o dos ingredientes cada una, y el mismo aliño para las cuatro. Qué toca cada día y qué lleva.</p>
+  <div id="ensaladas"></div>
+</section>
+
+<section class="panel" id="p-compra" hidden>
+  <p class="eyebrow">Lista derivada del menú</p>
+  <p class="lede">La mensual es lo que aguanta de una compra a otra: congelador, conservas, despensa y los quesos. La semanal es solo lo perecedero. Marcad cada artículo con su supermercado y la tercera pestaña los agrupa por tienda, con un botón para enviar cada bloque por WhatsApp. Con la sincronización puesta, lo que marque uno lo ven los demás al momento, en cualquier móvil y sin necesidad de cuenta. Si está apagada, cada dispositivo guarda lo suyo y las tiendas se pasan con «Copiar mis ajustes» y «Pegar ajustes».</p>
+
+  <div class="row" style="margin-top:18px">
+    <div class="segs" id="segs">
+      <button class="seg" data-lista="mensual" aria-pressed="true">Mensual</button>
+      <button class="seg" data-lista="semanal" aria-pressed="false">Semanal</button>
+      <button class="seg" data-lista="super" aria-pressed="false">Por supermercado</button>
+    </div>
+    <button class="btn" id="btnclear">Desmarcar todo</button>
+    <button class="btn" id="btnexp">Copiar mis ajustes</button>
+    <button class="btn" id="btnimp">Pegar ajustes</button>
+    <span class="status" id="cstatus"></span>
+  </div>
+
+  <div id="vlista"></div>
+  <div id="vsuper" hidden></div>
+</section>
+
+<!-- ================= SUGERENCIAS ================= -->
+<section class="panel" id="p-domingo" hidden>
+  <p class="eyebrow">Batch cooking</p>
+  <p class="lede">Qué se compra el jueves, qué se cocina el domingo y a qué día va cada cosa. Dos horas largas de domingo por tarde compran seis cenas y tres comidas de entre semana.</p>
+  <div id="batch"></div>
+</section>
+
+<section class="panel" id="p-sug" hidden>
+  <p class="eyebrow">Repertorio</p>
+  <p class="lede">Lo que puede entrar en cualquier hueco del menú sin recalcular nada.</p>
+  <div id="sug"></div>
+</section>
+
+<!-- ================= GASTO ================= -->
+<section class="panel" id="p-gasto" hidden>
+  <p class="eyebrow">Coste de la compra</p>
+  <p class="lede">Primero, una estimación calculada sobre el menú: qué debería costar esta compra a precios corrientes de supermercado. Debajo, el hueco para anotar lo que gastáis de verdad en cada tienda e ir afinando.</p>
+
+  <h2 class="sec">Estimación sobre el menú</h2>
+  <dl class="bigfig" id="estfigs"></dl>
+  <div class="scroller"><table class="data" id="testim"></table></div>
+  <p class="note" style="margin-top:14px;font-size:.82rem;color:var(--muted)" id="estnota"></p>
+
+  <h2 class="sec">Vuestro gasto real</h2>
+  <p class="lede">Lo que gastáis en cada tienda. Anotad la compra del mes y la página reparte el resto.</p>
+  <dl class="bigfig" id="figs"></dl>
+  <div class="scroller"><table class="gasto" id="tgasto"></table></div>
+  <p class="note" style="margin-top:14px;font-size:.82rem;color:var(--muted)">La compra semanal de verdura y fruta se hace cuatro veces al mes: sumadla entera en la tienda donde la hagáis.</p>
+</section>
+
+</div>
+
+<script>
+/* ============ DATOS ============ */
+const DIAS = [
+  { d:"Lunes", ent:[["h","Él · torso, tarde"],["d","Ella · descanso"]],
+    comida:{ tipo:"carne", plato:"Revuelto tipo fajitas con pavo y hummus casero",
+      det:"Pavo en tiras o pechuga de pollo del congelador, <b>170 g él · 120 g ella</b>, a la plancha. Pimiento y cebolla <b>frescos</b>, en tiras, salteados a fuego fuerte en la misma sartén. Comino, pimentón y cilantro. Hummus con garbanzo cocido <b>150 g él · 70 g ella</b>. Ensalada de remolacha y zanahoria.",
+      alm:["h","<b>Almidón:</b> el propio hummus. Ración larga para él, que entrena esta tarde; corta para ella."],
+      nota:"Todo se hace el mismo lunes: la bolsa de pavo baja a la nevera el domingo por la noche y la verdura va fresca, salteada en la sartén.", p:[59,40], t:"20 min" },
+    cena:{ tipo:"pescado", plato:"Migas de brócoli con quinoa, caballa y ricotta",
+      det:"Brócoli 200 g picado a cuchillo o con dos golpes de robot y salteado al ajo. <b>Quinoa de vasito</b>: <b>un vasito entero él · medio vasito ella</b>. Ricotta <b>60 g él · 40 g ella</b> removida fuera del fuego. Caballa escurrida <b>140 g él · 100 g ella</b>, en trozos grandes al final.",
+      alm:["h","<b>Almidón:</b> la quinoa, la única de la semana que va de noche. Vasito entero para él, justo después de entrenar."],
+      nota:"El vasito son 125 g ya cocidos, así que no hay que cocer nada. Doce minutos contando el picado del brócoli.", p:[47,33], t:"12 min" } },
+
+  { d:"Martes", ent:[["d","Descanso los dos"]],
+    comida:{ tipo:"carne", plato:"Entrecot a la plancha con boniato y ensalada verde",
+      det:"Entrecot <b>230 g él · 150 g ella</b>, dos minutos por cara y reposo de cinco. Boniato asado del lote, <b>90 g él · 80 g ella</b>. Ensalada verde: la hoja de la semana y pepino.",
+      alm:["none","<b>Almidón:</b> ración corta para los dos. Es el único día en que ninguno entrena, así que el martes es el día bajo en hidratos de la semana."],
+      nota:"Alterna con hamburguesa de vuestra picada o con solomillo de cerdo, mismo gramaje.", p:[56,39], t:"15 min" },
+    cena:{ tipo:"pescado", plato:"Crema de puerro, después sardinas (él) y merluza empanada (ella)",
+      det:"Crema de puerro y calabacín <b>300 ml él · 250 ml ella</b>, del lote de dos noches. <b>Él:</b> sardinas al horno 240 g, diez minutos a 220 °C con sal gorda, ajo y limón al sacarlas. <b>Ella:</b> merluza empanada 250 g en la freidora de aire, doce minutos a 200 °C. Los dos, con 200 g de setas al ajo.",
+      nota:"La única excepción a la regla de comer los dos lo mismo. La ración de ella es más larga porque el rebozado ocupa peso: la merluza empanada aporta 11 g de proteína por 100 frente a los 19 de la sardina.", p:[50,32], t:"10 min de horno" } },
+
+  { d:"Miércoles", ent:[["h","Él · pierna, antes de comer"],["m","Ella · cross, 9:30"]],
+    comida:{ tipo:"carne", plato:"Lentejas estofadas",
+      det:"Lenteja pardina seca <b>90 g él · 70 g ella</b>, chorizo <b>30 / 20 g</b>, panceta <b>30 / 20 g</b>, tacos de jamón <b>35 / 30 g</b>, zanahoria, cebolla, pimiento y patata <b>80 / 60 g</b>. Olla exprés, doce o quince minutos.",
+      alm:["both","<b>Almidón:</b> ración larga para los dos, y es el día en que mejor cae de toda la semana: los dos entrenáis por la mañana y esta comida es reposición directa."],
+      nota:"El batido de los dos va a media mañana, al salir de entrenar, y esta comida llega una o dos horas después.", p:[50,40], t:"cocinadas el domingo" },
+    cena:{ tipo:"huevo", plato:"Crema de puerro, después revuelto de huevo y claras con setas",
+      det:"Crema de puerro <b>300 ml él · 250 ml ella</b>, la segunda noche del lote. <b>Él: 3 huevos + 7 claras. Ella: 2 huevos + 4 claras.</b> Revueltos a fuego bajo. 200 g de setas al ajo salteadas aparte y mezcladas al final.",
+      alm:["none","<b>Sin almidón.</b> El día ya ha llevado la ración larga de lenteja al mediodía."],
+      nota:"Las claras son lo que hace que la cena llegue a los macros: sin ellas se quedaría en 20 g para él.", p:[50,32], t:"10 min" } },
+
+  { d:"Jueves", ent:[["h","Él · torso 2, tarde"],["d","Ella · descanso"]],
+    comida:{ tipo:"pescado", plato:"Salmón a la plancha con arroz y ensalada verde",
+      det:"Salmón <b>210 g él · 150 g ella</b>, piel abajo hasta que quede crujiente. <b>Arroz de vasito</b>, basmati blanco o integral: <b>un vasito entero él · medio vasito ella</b>, salteado en la sartén con un hilo de aceite. Ensalada verde con pepino, con canónigos si toca.",
+      alm:["h","<b>Almidón:</b> vasito entero para él, que entrena esta tarde; medio para ella."],
+      nota:"La comida más grasa de la semana: el mejor día para la vitamina D3 con K2 en invierno. Hoy es día de mercado, así que la ensalada va con la hoja recién comprada.", p:[51,38], t:"15 min" },
+    cena:{ tipo:"carne", plato:"Crema de calabaza, después solomillo de cerdo con mostaza",
+      det:"Crema de calabaza <b>300 ml él · 250 ml ella</b>, primera noche del lote. Solomillo en medallones <b>210 g él · 150 g ella</b>, sellados a fuego fuerte y terminados con mostaza de Dijon. 200 g de setas al ajo y tomillo.",
+      nota:"De este lote de calabaza salen también la cena del domingo y dos raciones al congelador.", p:[49,36], t:"15 min" } },
+
+  { d:"Viernes", ent:[["m","Ella · cross, 9:30"],["d","Él · descanso"]],
+    comida:{ tipo:"pescado", plato:"Mozzarella con tomate, después dorada con patata asada",
+      det:"De entrante, tomate en rodajas con mozzarella fresca <b>60 g él · 45 g ella</b>. Dorada <b>220 g él · 160 g ella</b> a la plancha con piel crujiente. Patata asada o cocida <b>100 g él · 200 g ella</b>, aliñada en caliente con aceite en crudo y sal gorda. Ensalada de tomate y cebolleta.",
+      alm:["m","<b>Almidón:</b> ración larga para ella, que entrenó por la mañana; corta para él."],
+      nota:"Alterna con lubina, mismo gramaje.", p:[63,50], t:"20 min" },
+    cena:{ tipo:"carne", plato:"Pizza casera sobre base de quinoa y semillas",
+      det:"Media base por persona. Tomate natural rallado, mozzarella rallada <b>70 g él · 50 g ella</b>, bacon <b>40 g él · 30 g ella</b> y atún al natural escurrido <b>100 g él · 70 g ella</b>. Orégano, y rúcula al salir del horno.",
+      alm:["none","<b>Almidón:</b> el de la base. Media para cada uno."],
+      nota:"Lleva bacon y atún a la vez. El bacon es la carne del día y por eso la alternancia sigue en pie: pescado al mediodía, carne por la noche.", p:[51,38], t:"10 min de horno" } },
+
+  { d:"Sábado", ent:[["h","Él · 6 km o fútbol sala, mañana"],["d","Ella · descanso"]],
+    comida:{ tipo:"carne", plato:"Cocido tradicional o arroz y habichuelas, según la semana",
+      det:"<b>Cocido, semanas impares:</b> morcillo 110 / 90 g, pollo 90 / 75 g, escaleta 40 / 30 g, garbanzo seco 80 / 35 g, puesto a remojo la noche anterior, patata y zanahoria. Sin fideos.<br><b>Arroz y habichuelas, semanas pares:</b> contramuslo 200 / 150 g, habichuela cocida <b>un bote entero</b>, repartido 200 / 120 g, arroz redondo 60 / 30 g y la verdura congelada de Mercadona: <b>alcachofa 120 / 80 g, habas 90 / 60 g y ajos tiernos</b>, más cebolla, pimiento y tomate natural rallado.",
+      alm:["h","<b>Almidón:</b> ración larga para él, que viene de correr; corta para ella, con la misma carne."],
+      nota:"Con el entrenamiento por la mañana, esta comida es reposición pura. La cena es libre, así que el guiso no rompe nada.", p:["67-71","51"], t:"olla exprés" },
+    cena:{ tipo:"flex", plato:"LIBRE ELECCIÓN",
+      det:"La noche que no se planifica. Fuera de casa, pizzería, hamburguesería o lo que apetezca en ese momento.",
+      nota:"Es el respiradero de la semana y conviene no tocarlo: un plan sin un hueco libre se abandona antes.", p:[45,32], t:"—" } },
+
+  { d:"Domingo", ent:[["d","Descanso los dos · día de lote"]],
+    comida:{ tipo:"pescado", plato:"Libre en el campo, o pasta de lenteja roja con atún",
+      det:"La mesa familiar queda fuera del plan. Si no salís: pasta de lenteja roja <b>90 g él · 60 g ella</b> en seco, siete minutos justos, con atún <b>120 / 80 g</b>, 200 g de tomate cherry asado, alcaparras y albahaca. El grana padano rallado por encima.",
+      alm:["none","<b>Almidón:</b> la propia pasta, que aporta 24 g de proteína por cada 100 en seco."],
+      p:[56,40], t:"15 min" },
+    cena:{ tipo:"huevo", plato:"Crema de calabaza, después revuelto de huevo y claras con setas",
+      det:"Crema de calabaza <b>300 ml él · 250 ml ella</b>, la que sobró del jueves. <b>Él: 3 huevos + 7 claras. Ella: 2 huevos + 4 claras.</b> 200 g de setas al ajo.",
+      alm:["none","<b>Sin almidón.</b> La semana cierra ligera."],
+      nota:"Cena de domingo mientras el horno termina el lote. Ver la pestaña «Domingo» para el orden de todo.", p:[50,32], t:"10 min" } },
+];
+
+const CUAD = [
+  ["Lunes","Él · torso, tarde","Revuelto tipo fajitas con pavo y hummus casero","carne","Hummus largo para él",
+   "Migas de brócoli con quinoa, caballa y ricotta","pez","Ocho minutos"],
+  ["Martes","Descanso los dos","Entrecot a la plancha con boniato y ensalada verde","carne","Boniato corto los dos",
+   "Crema de puerro · sardinas (él) y merluza empanada (ella)","pez","La única excepción de la semana"],
+  ["Miércoles","Él · pierna · Ella · cross 9:30","Lentejas estofadas","carne","Ración larga los dos",
+   "Crema de puerro y revuelto de huevo con claras","huevo","Él 3 huevos + 7 claras · ella 2 + 4"],
+  ["Jueves","Él · torso 2, tarde · MERCADO","Salmón a la plancha con arroz y ensalada","pez","Vasito entero para él",
+   "Crema de calabaza y solomillo de cerdo con setas","carne","De aquí sale la crema del domingo"],
+  ["Viernes","Ella · cross, 9:30","Mozzarella y tomate, después dorada con patata asada","pez","Patata larga para ella",
+   "Pizza casera de quinoa con bacon, mozzarella, tomate y atún","carne","Media base por persona"],
+  ["Sábado","Él · 6 km o fútbol sala","Cocido, o arroz y habichuelas con alcachofa y habas","carne","Legumbre corta para ella",
+   "LIBRE ELECCIÓN","","La noche que no se planifica"],
+  ["Domingo","Descanso · día de lote","Libre en el campo, o pasta de lenteja roja con atún","pez","Si coméis en casa",
+   "Crema de calabaza del jueves y revuelto de huevo con claras","huevo","Mientras el horno hace el lote"],
+];
+
+const SUPERS = [
+  {id:'mercadona',  n:'Mercadona'},
+  {id:'alcampo',    n:'Alcampo'},
+  {id:'superdumbo', n:'Superdumbo'},
+  {id:'carrefour',  n:'Carrefour'},
+  {id:'felipe',     n:'Carnicería Felipe'},
+  {id:'lidl',       n:'Lidl'},
+  {id:'mercado',    n:'Mercado'},
+];
+
+const LISTAS = {
+ mensual: [
+  { cat:"Pescado · congelador", items:[
+    ["sardinas","Sardinas","960 g · 4 bolsas de 240 g","Martes cena, solo para él"],
+    ["merluzaemp","Merluza empanada de Mercadona","1 kg · 4 raciones de 250 g","Martes cena, solo para ella"],
+    ["salmon","Salmón","1,44 kg · 4 bolsas de 360 g","Jueves comida, los dos"],
+    ["dorada","Dorada o lubina","1,52 kg · 4 bolsas de 380 g","Viernes comida, los dos"],
+  ], nota:"4,9 kg de pescado y 16 bolsas. El martes es la única cena con dos bolsas distintas: él sardina y ella merluza. El resto de la semana, una bolsa por cena con las dos raciones dentro."},
+
+  { cat:"Carne · congelador", items:[
+    ["pavo","Pavo en tiras o pechuga de pollo","1,16 kg · 4 bolsas de 290 g","El revuelto de cada lunes. Ya no hay pollo asado"],
+    ["entrecot","Entrecot, o pieza para picar en casa","1,52 kg · 4 bolsas de 380 g","Martes comida"],
+    ["solomillo","Solomillo de cerdo","1,44 kg · 4 bolsas de 360 g","Jueves cena"],
+    ["contramuslo","Contramuslo de pollo deshuesado","700 g · 2 bolsas de 350 g","Solo el arroz y habichuelas de los sábados pares"],
+    ["bacon","Bacon en lonchas","280 g · 4 bolsitas de 70 g","La pizza de cada viernes"],
+    ["cocido","Morcillo, pollo y escaleta de cocido","400 + 330 + 140 g · 2 lotes","Los dos sábados impares del mes"],
+    ["embutido","Chorizo, panceta y tacos de jamón","200 + 200 + 260 g · 4 bolsitas","Las lentejas de cada miércoles"],
+    ["jamon","Jamón serrano Navidul sin aditivos","20 paquetes de 70 g · 1,4 kg al mes","Cinco paquetes por semana, 35 g por persona y día. En nevera, no en congelador"],
+  ], nota:"El pollo entero desaparece de la compra. El revuelto del lunes se hace ese mismo día con la bolsa de pavo o de pechuga, bajada a la nevera el domingo por la noche: se gana el horno del domingo y se pierde un trasto menos que planificar. El contramuslo queda solo para el arroz de los sábados pares."},
+
+  { cat:"Conservas y claras", items:[
+    ["caballa","Caballa en aceite de oliva","8 latas grandes","Las migas del lunes: 240 g escurridos por semana"],
+    ["atun","Atún al natural","24 latas · 2 packs de 12","Pizza del viernes y pasta del domingo: unas 19 latas de consumo real"],
+    ["boquerones","Boquerones en vinagre","4 bandejas","Aperitivo del mediodía, alternando con el grana padano"],
+    ["berberechos","Berberechos al natural","4 latas","Solo aperitivo: ya no van en la cena del miércoles"],
+    ["claras","Claras de huevo pasteurizadas de Mercadona","88 claras al mes · unos 2,9 litros","22 por semana: él 7 y ella 4 en cada una de las dos cenas. Si el envase es de litro, tres"],
+    ["tomatetrit","Tomate triturado natural","3 botes","Sofritos. La pizza lleva tomate natural rallado, no de bote"],
+  ], nota:"Caballa en aceite de oliva, no de girasol. Las claras son la pieza nueva de la compra: sin ellas, una cena de huevo se queda en la mitad de proteína. Los boquerones comprados vienen congelados de origen; si los hacéis en casa, cinco días a –18 °C antes de marinar."},
+
+  { cat:"Verdura congelada · Mercadona", items:[
+    ["alcachofacong","Corazones de alcachofa","400 g · 1 bolsa","Arroz y habichuelas: 200 g por guiso, dos guisos al mes"],
+    ["habascong","Habas baby","300 g · 1 bolsa","Arroz y habichuelas: 150 g por guiso"],
+    ["ajostiernoscong","Ajos tiernos","200 g · 1 bolsa","Arroz y habichuelas: 100 g por guiso"],
+  ], nota:"Solo para los dos sábados pares. Entran al guiso congelados, sin descongelar: la alcachofa se deshace si se descongela antes."},
+
+  { cat:"Lácteos y quesos", items:[
+    ["leche","Leche entera","18 litros","3,5 L cada semana solo para el kéfir, más el café"],
+    ["grana","Grana padano o parmigiano","1 cuña de 1 kg","840 g al mes, 15 g por persona antes de comer"],
+    ["mozzrallada","Mozzarella rallada","500 g · 2 bolsas de 250 g","La pizza de cada viernes"],
+    ["mozzarella","Mozzarella fresca","4 bolas de 125 g","El entrante del viernes al mediodía"],
+    ["ricotta","Ricotta crema","2 tarrinas","Las migas del lunes. Baja de cuatro a dos tarrinas"],
+    ["yogur","Yogur natural","1 pack de 4","Solo para el hummus"],
+  ]},
+
+  { cat:"Legumbre, cereal y pasta", items:[
+    ["lenteja","Lenteja pardina","1 paquete de 1 kg","640 g al mes"],
+    ["garbanzobote","Garbanzo cocido de bote","4 botes · unos 880 g escurridos al mes","Solo el hummus. Un bote de 400 g deja unos 240 g escurridos"],
+    ["garbanzoseco","Garbanzo seco","1 paquete de 500 g","Los dos cocidos: 115 g por lote. Sobra para el mes siguiente"],
+    ["habichuela","Habichuelas cocidas de bote","2 botes","Un bote entero por guiso, los dos sábados pares"],
+    ["arrozint","Arroz de vasito, basmati blanco o integral","6 vasitos de 125 g","Vasito y medio por semana, el salmón del jueves"],
+    ["arrozredondo","Arroz redondo","1 paquete","180 g al mes, los dos sábados pares"],
+    ["quinoa","Quinoa de vasito, blanca o roja","6 vasitos de 125 g","Vasito y medio por semana, las migas del lunes"],
+    ["pastalenteja","Pasta de lenteja roja de Mercadona","2 paquetes","El domingo de repuesto"],
+    ["basepizza","Base de pizza de quinoa y semillas","4 unidades","Una por viernes. Congelan bien"],
+  ], nota:"Arroz y quinoa, los dos en vasito de 125 g: uno entero para él y medio para ella. Así no hay que cocer nada el domingo y desaparece cualquier problema de conservación del arroz cocido."},
+
+  { cat:"Grasas, frutos secos y condimentos", items:[
+    ["aove","Aceite de oliva virgen extra","2,5 litros",""],
+    ["nueces","Nueces","800 g","Desayuno y ensalada de remolacha"],
+    ["macadamia","Macadamia tostada","700 g","Desayuno"],
+    ["almendra","Almendra tostada","400 g",""],
+    ["aceitunas","Aceituna negra","1 bote","Solo aperitivo: sale de las ensaladas"],
+    ["encurtidos","Alcaparras y pepinillos","1 bote de cada",""],
+    ["coco","Coco rallado sin azúcar","1 paquete","Con los frutos rojos del desayuno"],
+    ["chocolate","Chocolate 85 %","6 tabletas · 560 g al mes","Una onza por persona de postre, todos los mediodías"],
+    ["vinagre","Vinagre de manzana ecológico, sin filtrar y sin pasteurizar","1 botella","El aliño de las cuatro ensaladas. Agitarlo antes de usar: la «madre» se posa"],
+    ["condimentos","Mostaza de Dijon, soja o tamari, vinagre de Jerez y de vino blanco","reponer",""],
+    ["especias","Especias secas, azafrán o colorante, sal gorda y pimienta en grano","reponer",""],
+  ]},
+
+  { cat:"Despensa fresca · aguanta el mes", items:[
+    ["patata","Patata","3 kg","Viernes, lentejas y cocido. Baja de 6 kg a 3"],
+    ["boniato","Boniato","4 unidades, unos 700 g","Solo el martes, y en ración corta para los dos"],
+    ["cebolla","Cebolla","5 kg","Revuelto, guisos, cremas y pizza"],
+    ["ajo","Ajo","8 cabezas",""],
+    ["calabaza","Calabaza","4 piezas, unos 6,5 kg en bruto","La crema lleva 1,2 kg ya limpios por semana. Entera aguanta el mes"],
+  ], nota:"La patata y el boniato caen mucho porque el almidón ya no se dobla: un solo alimento por día, con ración larga o corta según quién entrene."},
+
+  { cat:"Suplementos", items:[
+    ["whey","Whey isolate HSN","1 bote de 1 kg","720 g al mes: él cuatro días, ella dos"],
+    ["supl","Vitamina C liposomada, Ultra Omega 3, triple magnesio y D3 + K2","1 mes",""],
+  ]},
+ ],
+
+ semanal: [
+  { cat:"Verdura · mercado del jueves", items:[
+    ["setas","Setas variadas, champiñón y portobello","1 kg","Cuatro platos de 200 g: martes, miércoles, jueves y domingo. Merman mucho"],
+    ["brocoli","Brócoli","1 unidad de 400 g","Los 200 g de migas del lunes"],
+    ["lechuga","Hoja verde en rotación: romana, escarola, canónigos o rúcula","2 unidades o 2 bolsas, alternando cada semana","Ensaladas y la rúcula de la pizza"],
+    ["tomate","Tomate","2,5 kg","Desayuno, ensalada del viernes, entrante del viernes y la pizza"],
+    ["pepino","Pepino","3 unidades",""],
+    ["cebolleta","Cebolleta","1 manojo","Las cuatro ensaladas"],
+    ["remolacha","Remolacha cruda","2 unidades","Ensalada del lunes: 160 g, que es una pieza mediana"],
+    ["zanahoria","Zanahoria","1 kg","Ensalada, lentejas, cocido y cremas"],
+    ["pimiento","Pimiento rojo y verde","4 unidades","Revuelto del lunes, lentejas y el arroz de los sábados pares"],
+    ["puerro","Puerro","3 unidades","La crema de martes y miércoles"],
+    ["calabacin","Calabacín","2 unidades","La misma crema"],
+  ], nota:"Todo esto se compra el jueves en el mercado, así que la semana de la verdura va de jueves a miércoles. Lo delicado (canónigos, rúcula, hierbas) se gasta jueves, viernes y sábado, recién comprado; lo que aguanta (brócoli, puerro, calabaza, zanahoria) cubre lunes, martes y miércoles. Ver la pestaña «Domingo»."},
+
+  { cat:"Huevos · mercado del jueves", items:[
+    ["huevos","Huevos bio","10 huevos, una docena justa","Él 3 y ella 2 en cada una de las dos cenas, miércoles y domingo"],
+  ], nota:"Se compran cada semana para tenerlos frescos. Con la docena sobran dos, que sirven de margen."},
+
+  { cat:"Fruta · mercado del jueves", items:[
+    ["aguacate","Aguacate","7 unidades","Medio por persona y día"],
+    ["frutosrojos","Mora, frambuesa y fresa","1,4 kg","100 g por persona y día, con el kéfir"],
+    ["arandanos","Arándanos","360 g","Ración corta: doblan en hidratos al resto de frutos rojos"],
+    ["limon","Limones","5 unidades","Aliños y el pescado"],
+  ], nota:"Kilo cuatrocientos de frutos rojos frescos es la partida más cara de la compra semanal. Congelados cuestan alrededor de un tercio y para el kéfir funcionan igual: ahí hay unos 45 euros al mes."},
+
+  { cat:"Hierbas frescas · mercado del jueves", items:[
+    ["hierbas","Perejil, cilantro y albahaca","1 manojo de cada",""],
+    ["jengibre","Jengibre fresco","1 pieza","Crema de zanahoria asada"],
+    ["tomillo","Tomillo y romero","1 manojo de cada","Las setas y el solomillo del jueves"],
+  ]},
+ ]
+};
+
+const COSTES = {
+ mensual: [
+  { cat:"Pescado congelado", items:[
+    ["Sardinas","960 g, solo él",4.80],
+    ["Merluza empanada","1 kg, solo ella",7.00],
+    ["Salmón","1,44 kg",20.16],
+    ["Dorada o lubina","1,52 kg",19.76]
+  ]},
+  { cat:"Carne", items:[
+    ["Pavo o pechuga de pollo","1,16 kg",10.44],
+    ["Entrecot","1,52 kg",30.40],
+    ["Solomillo de cerdo","1,44 kg",13.68],
+    ["Contramuslo del arroz","700 g",4.90],
+    ["Bacon","280 g",2.52],
+    ["Carne de cocido","2 lotes",12.00],
+    ["Chorizo, panceta y tacos","660 g",7.50],
+    ["Jamón serrano sin aditivos","1,4 kg",22.40]
+  ]},
+  { cat:"Conservas y claras", items:[
+    ["Atún al natural","24 latas",21.60],
+    ["Caballa en AOVE","8 latas",17.60],
+    ["Berberechos","4 latas",10.40],
+    ["Boquerones en vinagre","4 bandejas",12.80],
+    ["Tomate triturado","3 botes",3.00],
+    ["Claras pasteurizadas","88 claras",9.60]
+  ]},
+  { cat:"Lácteos y quesos", items:[
+    ["Leche entera","18 L",18.90],
+    ["Grana padano","1 kg",14.00],
+    ["Ricotta crema","2 tarrinas",4.40],
+    ["Mozzarella fresca","4 bolas",4.80],
+    ["Mozzarella rallada","500 g",4.00],
+    ["Yogur natural","1 pack",1.50]
+  ]},
+  { cat:"Legumbre, cereal y pasta", items:[
+    ["Lenteja pardina","1 kg",2.50],
+    ["Garbanzo cocido","4 botes",3.60],
+    ["Garbanzo seco","500 g",1.80],
+    ["Habichuelas de bote","2 botes grandes",2.80],
+    ["Arroz redondo","1 paquete",1.40],
+    ["Arroz de vasito","6 vasitos",6.60],
+    ["Quinoa de vasito","6 vasitos",7.80],
+    ["Pasta de lenteja roja","2 paquetes",4.00],
+    ["Base de pizza","4 unidades",8.00]
+  ]},
+  { cat:"Verdura congelada", items:[
+    ["Alcachofa, habas y ajos tiernos","3 bolsas",7.00]
+  ]},
+  { cat:"Grasas, frutos secos y condimentos", items:[
+    ["AOVE","2,5 L",20.00],
+    ["Nueces","800 g",9.60],
+    ["Macadamia","700 g",18.20],
+    ["Almendra","400 g",4.40],
+    ["Aceituna, alcaparras y pepinillos","",6.00],
+    ["Coco rallado sin azúcar","",2.50],
+    ["Chocolate 85 %","6 tabletas",10.80],
+    ["Especias, vinagres, mostaza, azafrán","reponer",9.00]
+  ]},
+  { cat:"Despensa fresca", items:[
+    ["Patata","3 kg",4.20],
+    ["Boniato","4 unidades",1.54],
+    ["Cebolla","5 kg",6.50],
+    ["Ajo","8 cabezas",3.00],
+    ["Calabaza","4 piezas",8.00]
+  ]},
+  { cat:"Suplementos", items:[
+    ["Whey isolate","1 kg",30.00],
+    ["Vitamina C, omega 3, magnesio, D3+K2","1 mes",45.00]
+  ]}
+ ],
+ semanal: [
+  { cat:"Huevos", items:[
+    ["Huevos bio","10 unidades",3.00]
+  ]},
+  { cat:"Verdura", items:[
+    ["Setas variadas","1 kg",7.50],
+    ["Brócoli","1 unidad",1.60],
+    ["Hoja verde","2 unidades",3.20],
+    ["Tomate","2,5 kg",6.00],
+    ["Pepino","3 unidades",2.10],
+    ["Cebolleta","1 manojo",1.10],
+    ["Remolacha","2 unidades",1.40],
+    ["Zanahoria","1 kg",1.20],
+    ["Pimiento","4 unidades",2.20],
+    ["Puerro","3 unidades",2.40],
+    ["Calabacín","2 unidades",1.80]
+  ]},
+  { cat:"Fruta", items:[
+    ["Aguacate","7 unidades",6.65],
+    ["Mora, frambuesa y fresa","1,4 kg",17.50],
+    ["Arándanos","360 g",3.60],
+    ["Limones","5 unidades",1.50]
+  ]},
+  { cat:"Hierbas frescas", items:[
+    ["Perejil, cilantro, albahaca, tomillo, romero, jengibre","",4.50]
+  ]}
+ ]
+};
+
+const ENSALADAS = `
+<div class="scroller"><table class="data">
+<thead><tr><th>Día</th><th>Ensalada</th><th>Qué lleva, para dos</th></tr></thead>
+<tbody>
+<tr><td><b>Lunes</b><br><span style="color:var(--muted);font-size:.8rem">comida</span></td>
+    <td><b>De remolacha y zanahoria</b><br><span style="color:var(--muted);font-size:.8rem">sin tomate</span></td>
+    <td>Remolacha cruda rallada gruesa <b>160 g</b> · zanahoria rallada <b>120 g</b></td></tr>
+<tr><td><b>Martes</b><br><span style="color:var(--muted);font-size:.8rem">comida</span></td>
+    <td><b>Verde</b><br><span style="color:var(--muted);font-size:.8rem">sin tomate</span></td>
+    <td>Hoja de la semana <b>160 g</b> · <b>un pepino</b></td></tr>
+<tr><td><b>Jueves</b><br><span style="color:var(--muted);font-size:.8rem">comida</span></td>
+    <td><b>Verde</b><br><span style="color:var(--muted);font-size:.8rem">sin tomate</span></td>
+    <td>Hoja de la semana <b>160 g</b> · <b>un pepino</b></td></tr>
+<tr><td><b>Viernes</b><br><span style="color:var(--muted);font-size:.8rem">comida</span></td>
+    <td><b>De tomate y cebolleta</b><br><span style="color:var(--muted);font-size:.8rem">con tomate</span></td>
+    <td>Dos tomates grandes y maduros · <b>una cebolleta</b></td></tr>
+<tr><td><b>Comodín</b><br><span style="color:var(--muted);font-size:.8rem">cualquier día</span></td>
+    <td><b>De pepino y encurtidos</b><br><span style="color:var(--muted);font-size:.8rem">sin tomate</span></td>
+    <td>Un pepino grande · <b>dos pepinillos en vinagre</b> picados</td></tr>
+</tbody></table></div>
+
+<div class="cols">
+  <div class="card ok"><h4>El aliño, igual para las cuatro</h4><ul>
+    <li><b>Aceite de oliva virgen extra</b></li>
+    <li><b>Vinagre de manzana ecológico, sin filtrar y sin pasteurizar</b></li>
+    <li><b>Sal</b>, al final y nunca antes de servir: antes saca el agua de la hoja y se queda mustia</li>
+    <li>Orden: primero la sal, después el vinagre, al final el aceite. La sal se disuelve en el vinagre, no en el aceite</li>
+    <li>Ese vinagre conserva la «madre», el poso turbio del fondo, que es celulosa y bacterias acéticas del propio proceso. Agitar el bote antes de usarlo</li>
+  </ul></div>
+</div>
+
+<h2 class="sec">La rotación de hoja</h2>
+<p class="lede">Una por semana, no las cuatro a la vez. Del mercado del jueves conviene traer dos: una firme para el principio de semana y una delicada para el jueves y el viernes.</p>
+<div class="scroller"><table class="data">
+<thead><tr><th>Hoja</th><th>Con qué</th><th>Cómo se corta</th><th>Aguanta</th></tr></thead>
+<tbody>
+<tr><td><b>Romana</b></td><td>La base de todo, y bajo la caballa</td><td>A mano, tiras anchas</td><td class="n">6-7 días</td></tr>
+<tr><td><b>Escarola</b></td><td>Carne roja del martes y guisos</td><td>A cuchillo, tiras finas</td><td class="n">6-7 días</td></tr>
+<tr><td><b>Canónigos</b></td><td>Salmón del jueves, dorada del viernes</td><td>Enteros, sin cortar</td><td class="n">3-4 días</td></tr>
+<tr><td><b>Rúcula</b></td><td>Entrecot y la pizza del viernes</td><td>Entera. Sobre la pizza, al salir del horno</td><td class="n">3-4 días</td></tr>
+</tbody></table></div>
+`;
+
+const BATCH = `
+<h2 class="sec">La semana de verdad empieza el jueves</h2>
+<p class="lede">La verdura y la fruta se compran el jueves en el mercado, así que la semana del fresco va de jueves a miércoles y no de lunes a domingo. Eso cambia qué se gasta primero y qué tiene que aguantar hasta el final.</p>
+<div class="scroller"><table class="data">
+<thead><tr><th>Día</th><th>Qué pasa</th></tr></thead>
+<tbody>
+<tr><td><b>Jueves</b></td><td>Mercado. Entra toda la verdura, la fruta y las hierbas. Esa misma comida ya se usa: la ensalada del mediodía va con la hoja recién comprada</td></tr>
+<tr><td><b>Viernes y sábado</b></td><td>Se gasta lo delicado, que es cuando está bueno: rúcula y canónigos, albahaca para la pizza, frutos rojos</td></tr>
+<tr><td><b>Domingo</b></td><td><b>El horno.</b> Cuarenta minutos, y casi todos sin vigilar</td></tr>
+<tr><td><b>Lunes a miércoles</b></td><td>Se tira de lo que aguanta: brócoli, puerro, calabaza, zanahoria, patata y boniato</td></tr>
+</tbody></table></div>
+
+<h2 class="sec">Qué aguanta y qué no</h2>
+<p class="lede">Del jueves al miércoles hay seis días. No todo llega igual.</p>
+<div class="cols">
+  <div class="card no"><h4>Se gasta en los tres primeros días</h4><p class="sub">Jueves, viernes y sábado</p><ul>
+    <li><b>Rúcula y canónigos.</b> Tres o cuatro días como mucho. Por eso la ensalada del jueves y la rúcula de la pizza del viernes son suyas</li>
+    <li><b>Albahaca, cilantro y perejil.</b> En un vaso con agua en la nevera aguantan algo más, pero están para el fin de semana</li>
+    <li><b>Frambuesa y mora.</b> Dos o tres días. <b>Comprad parte congelada</b> para el lunes, el martes y el miércoles: para el kéfir funcionan igual y así no se tira nada</li>
+    <li><b>Setas.</b> Una semana justa en papel, nunca en bolsa de plástico. El plato del miércoles es el que más apura</li>
+  </ul></div>
+  <div class="card ok"><h4>Llega perfectamente al miércoles</h4><ul>
+    <li><b>Brócoli</b>, hasta una semana entero. Se pica el lunes mismo, a cuchillo o con dos golpes de robot</li>
+    <li><b>Puerro y calabacín</b>, dos semanas. La crema se hace el martes, el día que toca</li>
+    <li><b>Calabaza entera</b>, más de un mes</li>
+    <li><b>Pimiento, cebolla, zanahoria y remolacha</b>, una semana larga. El pimiento y la cebolla del revuelto del lunes van frescos, salteados en la sartén</li>
+    <li><b>Romana y escarola</b>, hoja firme: seis o siete días. Son las que cubren el principio de semana</li>
+    <li><b>Patata, boniato, cebolla y ajo</b>, de la despensa mensual</li>
+  </ul></div>
+</div>
+<p class="lede"><b>Regla corta para el mercado:</b> llevad dos hojas distintas. Una firme, romana o escarola, para lunes y martes. Una delicada, canónigos o rúcula, para jueves y viernes.</p>
+
+<h2 class="sec">El horno del domingo</h2>
+<p class="lede">Solo lo que pide horno y aguanta la semana. Las cremas, las migas y el hummus se hacen el día que tocan, que no dan trabajo. Cuarenta minutos en total, y el horno trabaja solo.</p>
+<div class="cols">
+  <div class="card ok"><h4>Lo que va sí o sí</h4><p class="sub">40 minutos · horno a 200 °C</p><ul>
+    <li><b>Cuatro boniatos enteros, con piel.</b> Cuarenta minutos a 200 °C, sin pelar ni cortar. Son la guarnición del martes</li>
+    <li>Se dejan enfriar, se guardan enteros en la nevera y el martes se abren y se recalientan en la freidora de aire, 180 °C, cinco minutos. Quedan mejor que recién hechos</li>
+    <li>Aguantan los cinco días sin problema mientras no se pelen</li>
+  </ul></div>
+  <div class="card"><h4>Opcional, si el horno ya está puesto</h4><ul>
+    <li><b>La calabaza del jueves.</b> 1,2 kg en dados con dos cebollas en cuartos, en la otra bandeja, treinta y cinco minutos. Asada aguanta cuatro días en nevera</li>
+    <li>Con eso, la crema del jueves baja de cuarenta y cinco minutos a diez: solo triturar con el caldo y el aceite</li>
+    <li>No es obligatorio. Si preferís asarla el jueves mismo, el resultado es idéntico; solo cambia dónde cae el rato de horno</li>
+  </ul></div>
+  <div class="card no"><h4>Lo que ya no va aquí</h4><ul>
+    <li><b>Las dos cremas.</b> Se hacen el primer día que tocan: la de puerro el martes, la de calabaza el jueves. La de puerro sirve además para el miércoles y la de calabaza para el domingo</li>
+    <li><b>Las migas de brócoli.</b> Se pican y se saltean el lunes, tres minutos</li>
+    <li><b>El pimiento y la cebolla del revuelto.</b> Frescos, salteados en la misma sartén que el pavo</li>
+    <li><b>La quinoa y el arroz.</b> Vasitos de 125 g: no hay nada que cocer</li>
+  </ul></div>
+</div>
+
+<h2 class="sec">Lo que sí conviene adelantar, aunque no sea horno</h2>
+<p class="lede">Dos cosas, y las dos por comodidad, no por necesidad.</p>
+<div class="cols">
+  <div class="card"><h4>Las lentejas</h4><ul>
+    <li>El miércoles él entrena justo antes de comer, así que el guiso a mediodía va apretado</li>
+    <li>La olla exprés trabaja sola: <b>320 g de lenteja seca el domingo o el martes por la noche</b>, quince minutos, y salen cuatro raciones. Dos para el miércoles y dos al congelador</li>
+    <li>Y mejoran de un día para otro, que es el argumento de verdad</li>
+  </ul></div>
+  <div class="card"><h4>El hummus</h4><ul>
+    <li>Cinco minutos de robot y aguanta cuatro días en nevera</li>
+    <li>Da igual hacerlo el domingo o el lunes antes de comer. Si el robot ya está fuera, aprovechad</li>
+  </ul></div>
+  <div class="card"><h4>El cocido, semanas impares</h4><ul>
+    <li>Garbanzo a remojo el viernes por la noche y olla el sábado por la mañana, o el viernes si preferís comerlo reposado</li>
+    <li>El caldo se cuela y pasa <b>toda la noche en la nevera</b>, destapado. Al día siguiente la grasa se retira solidificada de un tirón y se congela en porciones de 300 ml: es un primero de noche gratis</li>
+    <li>El arroz y habichuelas de las semanas pares <b>no se adelanta</b>: el arroz no aguanta de un día para otro</li>
+  </ul></div>
+</div>
+
+<h2 class="sec">Lo que hay que cocinar cada día</h2>
+<p class="lede">Con el horno del domingo hecho, esto es lo que queda. El día más largo son veinticinco minutos.</p>
+<div class="scroller"><table class="data">
+<thead><tr><th>Día</th><th>Comida</th><th>Cena</th></tr></thead>
+<tbody>
+<tr><td><b>Lunes</b></td><td>Revuelto con verdura fresca y hummus · <b>20 min</b></td><td>Migas de brócoli con quinoa de vasito · <b>12 min</b></td></tr>
+<tr><td><b>Martes</b></td><td>Entrecot y boniato del horno · <b>15 min</b></td><td>Crema de puerro desde cero y sardinas o merluza · <b>25 min</b></td></tr>
+<tr><td><b>Miércoles</b></td><td>Lentejas, si no se adelantaron · <b>25 min</b></td><td>Crema del martes y revuelto de huevo · <b>10 min</b></td></tr>
+<tr><td><b>Jueves</b></td><td>Salmón y arroz de vasito · <b>15 min</b></td><td>Crema de calabaza y solomillo · <b>45 min</b>, o <b>15</b> si la calabaza se asó el domingo</td></tr>
+<tr><td><b>Viernes</b></td><td>Dorada y patata asada · <b>40 min</b>, casi todo de horno</td><td>Pizza · <b>10 min</b></td></tr>
+<tr><td><b>Sábado</b></td><td>El guiso · <b>olla exprés</b></td><td>Libre</td></tr>
+<tr><td><b>Domingo</b></td><td>Fuera, o pasta de lenteja · <b>15 min</b></td><td>Crema del jueves y revuelto de huevo · <b>10 min</b></td></tr>
+</tbody></table></div>
+<p class="lede">El jueves es el día más cargado, y es justo el que se arregla asando la calabaza el domingo. El viernes al mediodía son cuarenta minutos, pero treinta y cinco son la patata en el horno sin tocar nada.</p>
+
+<h2 class="sec">Cada noche, del congelador a la nevera</h2>
+<p class="lede">Es el único hábito diario que pide el plan. Treinta segundos antes de acostarse.</p>
+<div class="scroller"><table class="data">
+<thead><tr><th>La noche de</th><th>Se baja</th><th>Para</th></tr></thead>
+<tbody>
+<tr><td>Domingo</td><td>Bolsa de pavo o pechuga, 290 g</td><td>Lunes, comida</td></tr>
+<tr><td>Lunes</td><td>Entrecot 380 g · sardinas 240 g · merluza empanada 250 g</td><td>Martes</td></tr>
+<tr><td>Martes</td><td>Nada: el miércoles es lenteja y huevo</td><td>—</td></tr>
+<tr><td>Miércoles</td><td>Salmón 360 g · solomillo 360 g</td><td>Jueves</td></tr>
+<tr><td>Jueves</td><td>Dorada 380 g · bacon 70 g · base de pizza</td><td>Viernes</td></tr>
+<tr><td>Viernes</td><td>El lote del cocido, o el contramuslo 350 g</td><td>Sábado</td></tr>
+<tr><td>Sábado</td><td>Nada: el domingo es pasta y huevo</td><td>—</td></tr>
+</tbody></table></div>
+<p class="lede">La merluza empanada es la excepción: va del congelador a la freidora de aire directamente, sin descongelar. La alcachofa de los sábados pares, también. La caballa, el atún y los boquerones son conserva y no pasan por el congelador.</p>
+`;
+
+const TODOS = [].concat(LISTAS.mensual, LISTAS.semanal);
+
+const SUG = `
+<h2 class="sec">Los aperitivos del mediodía</h2>
+<p class="lede">Lo que se pica de pie en la cocina mientras se termina de hacer la comida. Va antes del plato, nunca entre horas, y suma proteína en lugar de restarla.</p>
+<div class="cols">
+  <div class="card ok"><h4>Boquerones en vinagre</h4><p class="sub">60 g por persona · unos 12 g de proteína</p><ul>
+    <li>Los de bandeja vienen listos: escurrir el exceso de vinagre y cubrirlos de AOVE con ajo laminado y perejil picado media hora antes</li>
+    <li>Cinco o seis lomos por persona. Con eso y el pan fuera de la mesa, es el aperitivo más limpio del plan</li>
+    <li>Si los hacéis en casa, la anchoa tiene que pasar <b>cinco días a –18 °C</b> antes de marinarla, y ese paso no es negociable: es la única forma de inactivar el anisakis en pescado que no se cocina</li>
+    <li>Después, dos horas en vinagre de vino blanco con sal, escurrir y cubrir de aceite</li>
+    <li>Cuentan como pescado azul del día, así que no van en una comida que ya lleve pescado: encajan el lunes, el martes y el miércoles al mediodía</li></ul></div>
+  <div class="card"><h4>Grana padano en lascas</h4><p class="sub">14 g por persona · unos 5 g de proteína</p><ul>
+    <li>El de siempre. En lascas gruesas sacadas con el pelador, nunca rallado</li>
+    <li>Va con cualquier comida, incluidas las de pescado</li></ul></div>
+  <div class="card"><h4>Los otros dos</h4><ul>
+    <li><b>Berberechos al natural</b>, media lata escurrida con limón y pimienta</li>
+    <li><b>Aceituna negra y encurtidos</b>, cuando no apetece nada más</li>
+    <li><b>Edamame en vaina</b>, cuatro minutos en agua con sal gorda</li></ul></div>
+</div>
+
+<h2 class="sec">Arroz y habichuelas, semanas pares</h2>
+<p class="lede">La versión con la verdura congelada de Mercadona. Para dos, con los gramajes ya repartidos.</p>
+<div class="cols">
+  <div class="card"><h4>Cómo se hace</h4><p class="sub">Cazuela o robot · unos 45 minutos</p><ul>
+    <li><b>Ingredientes:</b> contramuslo de pollo 200 / 150 g, <b>un bote entero</b> de habichuela cocida, repartido 200 / 120 g, arroz redondo 60 / 30 g en seco, alcachofa congelada 120 / 80 g, habas congeladas 90 / 60 g, ajos tiernos congelados 100 g, una cebolla, dos tomates naturales rallados, pimiento verde, un diente de ajo, pimentón, azafrán o colorante, AOVE y sal</li>
+    <li>Dorar el contramuslo en trozos grandes con aceite, a fuego fuerte, y reservar. Ahí queda el fondo del guiso</li>
+    <li>Sofrito largo de cebolla y pimiento, unos quince minutos, y el ajo al final. Añadir el tomate rallado y dejar que pierda el agua</li>
+    <li>Pimentón fuera del fuego, tres segundos, y enseguida el agua o el caldo: si se quema amarga el guiso entero</li>
+    <li><b>La verdura entra congelada, sin descongelar.</b> Primero los ajos tiernos y las habas; la alcachofa, cinco minutos después, porque se deshace antes que las otras dos</li>
+    <li>Volver el pollo, el azafrán y quince minutos de hervor. Después el arroz y la habichuela escurrida, y contar dieciocho minutos</li>
+    <li>Reposo de cinco minutos fuera del fuego. Debe quedar caldoso, no seco</li>
+    <li><b>Aporta unos 70 g de proteína a él y 50 g a ella</b>, que es prácticamente lo mismo que el cocido de las semanas impares</li></ul></div>
+</div>
+
+<h2 class="sec">Las dos cenas de huevo</h2>
+<p class="lede">Miércoles y domingo. Es la cena más barata y la más rápida de la semana, y la única que necesita un truco para llegar a los macros.</p>
+<div class="cols">
+  <div class="card ok"><h4>Huevos revueltos con claras</h4><p class="sub">Él 3 huevos + 7 claras · ella 2 huevos + 4 claras</p><ul>
+    <li>El bote trae el medidor marcado en claras, así que las cuentas van en claras y no en mililitros. Una clara son unos 33 ml y aporta <b>3,6 g de proteína</b>; un huevo entero, <b>6,5 g</b></li>
+    <li><b>Él:</b> 3 huevos son 20 g. Con <b>7 claras</b> suma otros 25 y la parte de huevo llega a <b>45 g</b></li>
+    <li><b>Ella:</b> 2 huevos son 13 g. Con <b>4 claras</b> suma 14 más y se queda en <b>27 g</b></li>
+    <li>Con la crema y las setas, la cena cierra en 50 g para él y 32 para ella, que es justo lo que pide el plan</li>
+    <li>Si un día tomáis un huevo más, quitad dos claras: se compensa casi exacto</li>
+    <li>Batir enteros y claras juntos con una pizca de sal. Sartén a fuego <b>bajo</b> y remover sin parar: las claras cuajan antes que la yema y a fuego fuerte quedan gomosas</li>
+    <li>Fuera del fuego cuando aún parezcan poco hechos. Terminan de cuajar con el calor residual</li>
+    <li>Las setas al ajo se saltean aparte, a fuego fuerte, y se mezclan al final. Si van desde el principio sueltan agua y el revuelto se aguada</li>
+    <li>El miércoles, ojo con el magnesio: el revuelto no lleva lácteo, así que se puede tomar a la hora de siempre</li></ul></div>
+  <div class="card"><h4>Variantes, sin cambiar los macros</h4><ul>
+    <li><b>Con jamón serrano en taquitos</b>, 30 g por persona, salteados antes</li>
+    <li><b>Con portobello</b> en lugar de setas variadas, más carnoso</li>
+    <li><b>En tortilla gruesa</b> en vez de revuelto, si se prefiere: mismo batido, sartén pequeña y fuego bajo con tapa</li>
+    <li><b>Con cebolla caramelizada</b> del lote del domingo</li></ul></div>
+</div>
+
+<h2 class="sec">Primeros de noche, ahora por lotes</h2>
+<p class="lede">Dos elaboraciones por semana en lugar de cuatro. La de puerro cubre el martes y el miércoles; la de calabaza, el jueves y el domingo, y de ella sobran dos raciones para el congelador. Todos sin almidón y sin lácteo, así que no interfieren con el magnesio.</p>
+<div class="cols">
+  <div class="card ok"><h4>Crema de puerro y calabacín</h4><p class="sub">Martes y miércoles · 4 raciones · 25 min</p><ul>
+    <li><b>Para las dos noches:</b> 3 puerros, 2 calabacines, una cebolla, una patata pequeña si la queréis más espesa, 900 ml de caldo o agua y cuatro cucharadas de AOVE</li>
+    <li>Sale algo más de litro y cuarto: 300 ml para él y 250 para ella, dos noches</li>
+    <li>Solo la parte blanca y el primer verde tierno del puerro. Abrirlo a lo largo y lavarlo bien, que guarda tierra entre las capas</li>
+    <li>Pochar quince minutos a fuego medio sin que coja color, caldo caliente, diez minutos de hervor y triturar con el aceite en crudo</li>
+    <li>Se conserva dos días en nevera sin perder nada. Se recalienta a fuego bajo, removiendo</li></ul></div>
+  <div class="card ok"><h4>Crema de calabaza, zanahoria y cebolla</h4><p class="sub">Jueves y domingo, más dos al congelador · 6 raciones · 45 min</p><ul>
+    <li><b>Para el lote entero:</b> 1,2 kg de calabaza, 3 zanahorias, 2 cebollas, 800 ml de caldo, AOVE, comino y pimienta</li>
+    <li>Calabaza en dados y cebolla en cuartos <b>al horno</b>, 200 °C, treinta y cinco minutos, hasta que los bordes caramelicen. Asarla y no cocerla es lo que cambia la receta</li>
+    <li>Aprovechad que el horno está puesto el domingo con el pollo y los boniatos</li>
+    <li>Triturar con el caldo caliente y el aceite en crudo</li>
+    <li>Cuatro raciones para el jueves y el domingo; las otras dos, al congelador en porciones de 300 ml</li></ul></div>
+</div>
+<p class="lede">Las cuatro de abajo siguen en pie como recambio, para las semanas en que apetezca otra cosa. Se hacen igual, en lote de seis raciones.</p>
+<div class="cols">
+  <div class="card"><h4>Crema de champiñón y cebolla</h4><p class="sub">La más saciante · 25 min</p><ul>
+    <li>700 g de champiñón, dos cebollas, dos ajos, 600 ml de caldo, cuatro cucharadas de aceite y tomillo</li>
+    <li>Cebolla en juliana quince minutos a fuego medio, hasta dorar. Ajo el último minuto</li>
+    <li><b>Champiñón en dos tandas y a fuego máximo.</b> Si va todo junto se cuece en su agua y pierde el tostado, que es de donde sale el carácter</li>
+    <li>Caldo caliente, cinco minutos de hervor y tomillo</li>
+    <li>Triturar dos minutos con el aceite restante en crudo: emulsiona y queda sedosa sin lácteo</li></ul></div>
+  <div class="card"><h4>Crema de zanahoria asada</h4><p class="sub">La más antiinflamatoria · 45 min</p><ul>
+    <li>Un kilo de zanahoria, una cebolla, jengibre, cucharadita de cúrcuma, <b>60 g de almendra cruda</b> y 600 ml de caldo</li>
+    <li>Zanahoria en bastones y cebolla en cuartos al horno, 200 °C, treinta y cinco minutos, hasta que los bordes caramelicen. <b>Asarlas y no cocerlas es todo el secreto</b></li>
+    <li>Al vaso con el jengibre rallado, la cúrcuma y el caldo. Triturar</li>
+    <li>La almendra cruda al vaso con el caldo y triturar con todo: deja la crema igual de sedosa que la leche de coco y encaja mejor con el resto del plan</li>
+    <li>Pimienta negra al servir: la piperina multiplica la absorción de la curcumina</li></ul></div>
+  <div class="card"><h4>Caldo del cocido desgrasado</h4><p class="sub">Sale gratis los sábados · 10 min</p><ul>
+    <li>Colar el caldo del cocido por un colador fino: salen unos dos litros</li>
+    <li><b>A la nevera toda la noche</b>, en recipiente ancho. Este paso no se puede saltar</li>
+    <li>Al día siguiente la grasa está solidificada arriba y se retira entera con una cuchara</li>
+    <li>Porciones de 300 ml al congelador. Se sirve muy caliente con perejil</li>
+    <li>Pedid un par de huesos de rodilla para el cocido: es lo que hace que gelatinice</li></ul></div>
+  <div class="card"><h4>Sopa de tomate asado con albahaca</h4><p class="sub">La más dulce sin llevar nada dulce · 50 min</p><ul>
+    <li>Kilo y medio de tomate pera, dos cabezas de ajo enteras, una cebolla, aceite abundante y orégano</li>
+    <li>Tomate boca arriba, cebolla en cuartos y los ajos con el sombrero cortado. 200 °C, cuarenta minutos</li>
+    <li>Apretar los ajos para sacar la pulpa y al vaso con todo, incluido el jugo de la bandeja</li>
+    <li><b>Albahaca al final, con el robot parado y unos segundos.</b> Si se tritura mucho se oxida y amarga</li>
+    <li>El licopeno se absorbe varias veces mejor cocinado y con grasa: es la forma más eficiente de tomarlo</li></ul></div>
+  <div class="card ok"><h4>Las dos de siempre y el verano</h4><ul>
+    <li><b>Crema de puerro y calabacín.</b> La más neutra, y la única vía por la que esas dos verduras entran en casa</li>
+    <li><b>Crema de calabaza, zanahoria y cebolla.</b> Asando la calabaza en lugar de cocerla parece otra receta</li>
+    <li><b>Gazpacho</b> en verano, sustituye a cualquier crema sin tocar nada</li>
+    <li><b>Crema fría de pepino y aguacate:</b> pepino pelado, aguacate, ajo, limón, aceite y agua muy fría</li>
+    <li><b>Salmorejo sin pan</b>, con 40 g de almendra cruda en lugar de la miga</li></ul></div>
+</div>
+
+<h2 class="sec">La semana de entrenamientos</h2>
+<div class="cols">
+  <div class="card"><h4>Él · 85 kg</h4><p class="sub">Cuatro sesiones</p><ul>
+    <li><b>Lunes, torso</b> · por la tarde</li>
+    <li><b>Miércoles, pierna</b> · antes de comer</li>
+    <li><b>Jueves, torso 2</b> · por la tarde</li>
+    <li><b>Sábado, 6 km o fútbol sala</b> · por la mañana</li>
+    <li>Whey isolate al terminar: lunes, miércoles, jueves y sábado</li></ul></div>
+  <div class="card"><h4>Ella · 64 kg</h4><p class="sub">Dos sesiones</p><ul>
+    <li><b>Miércoles, cross</b> · 9:30</li>
+    <li><b>Viernes, cross</b> · 9:30</li>
+    <li>Whey isolate a media mañana, al salir del box</li></ul></div>
+  <div class="card ok"><h4>Lo que esto ordena</h4><ul>
+    <li><b>El miércoles es el mejor día del plan.</b> Entrenáis los dos por la mañana y la comida es el plato de cuchara: la lenteja cae una o dos horas después del esfuerzo, que es exactamente donde tiene que caer</li>
+    <li><b>El martes no entrena nadie</b>, así que es el día bajo en hidratos: boniato en ración corta para los dos y nada más</li>
+    <li>Él tiene cuatro días de carga y ella dos, y por eso su ración larga aparece cuatro veces y la de ella dos</li>
+    <li>La quinoa del lunes por la noche es el único almidón nocturno, y cae justo después de su sesión de torso</li></ul></div>
+</div>
+
+<h2 class="sec">El módulo de almidón</h2>
+<p class="lede">Un solo alimento por día y el mismo para los dos. Lo que cambia es el tamaño de la ración: larga para quien entrena ese día, corta para quien descansa.</p>
+<div class="scroller"><table class="data">
+<thead><tr><th>Día</th><th>Alimento</th><th>Él · 85 kg</th><th>Ella · 64 kg</th></tr></thead>
+<tbody>
+<tr><td><b>Lunes</b><br><span style="color:var(--muted);font-size:.8rem">él, torso tarde</span></td><td>Hummus al mediodía y quinoa de vasito por la noche</td><td class="n">150 g garbanzo · un vasito</td><td class="n">70 g garbanzo · medio vasito</td></tr>
+<tr><td><b>Martes</b><br><span style="color:var(--muted);font-size:.8rem">nadie entrena</span></td><td>Boniato asado</td><td class="n">90 g</td><td class="n">80 g</td></tr>
+<tr><td><b>Miércoles</b><br><span style="color:var(--muted);font-size:.8rem">los dos, por la mañana</span></td><td>Lenteja en seco</td><td class="n">90 g</td><td class="n">70 g</td></tr>
+<tr><td><b>Jueves</b><br><span style="color:var(--muted);font-size:.8rem">él, torso tarde</span></td><td>Arroz de vasito, basmati o integral</td><td class="n">un vasito · 125 g</td><td class="n">medio vasito · 62 g</td></tr>
+<tr><td><b>Viernes</b><br><span style="color:var(--muted);font-size:.8rem">ella, cross 9:30</span></td><td>Patata asada o cocida</td><td class="n">100 g</td><td class="n">200 g</td></tr>
+<tr><td><b>Sábado</b><br><span style="color:var(--muted);font-size:.8rem">él, por la mañana</span></td><td>El garbanzo del cocido, o el arroz y la habichuela</td><td class="n">ración larga</td><td class="n">ración corta</td></tr>
+<tr><td><b>Domingo</b><br><span style="color:var(--muted);font-size:.8rem">descanso</span></td><td>Libre, o la pasta de lenteja roja</td><td class="n">90 g</td><td class="n">60 g</td></tr>
+</tbody></table></div>
+
+<h2 class="sec">Qué arroz conviene</h2>
+<p class="lede">La pregunta tiene dos partes: cuál es mejor y si se puede cocer una vez y guardarlo toda la semana. Van por separado, porque las respuestas no coinciden.</p>
+<div class="cols">
+  <div class="card ok"><h4>El orden, para esta dieta</h4><ul>
+    <li><b>1. Basmati integral.</b> La mejor de las cuatro. El basmati es rico en amilosa, la forma de almidón que se digiere más despacio, y por eso tiene el índice glucémico más bajo de los arroces corrientes. Con el salvado añade fibra, magnesio y vitaminas del grupo B</li>
+    <li><b>2. Basmati blanco.</b> Conserva la ventaja de la amilosa. Pierde fibra y minerales</li>
+    <li><b>3. Integral corriente.</b> Más fibra que el blanco, pero sube más la glucosa que el basmati y concentra más arsénico inorgánico, porque el arsénico se acumula precisamente en el salvado</li>
+    <li><b>4. Redondo o bomba.</b> El de índice glucémico más alto y el de menos amilosa. Es el correcto para el arroz y habichuelas, porque absorbe el caldo, y el equivocado como guarnición</li></ul></div>
+  <div class="card"><h4>Sobre el arsénico, con proporción</h4><ul>
+    <li>Es real: la EFSA actualizó en 2024 su evaluación y concluyó que la exposición crónica al arsénico inorgánico deja márgenes estrechos en adultos</li>
+    <li>Pero eso pesa con consumos altos y diarios. <b>Vosotros tomáis vasito y medio a la semana</b>: el integral no os plantea ningún problema</li>
+    <li>Si el arroz pasara a dos o tres veces por semana, entonces sí compensa que sea basmati</li>
+    <li>Lavarlo bien y cocerlo con agua abundante que luego se tira reduce bastante el arsénico. Con el vasito, esto no aplica</li></ul></div>
+  <div class="card no"><h4>Cocer y guardar: sí, pero con reglas</h4><ul>
+    <li>El problema no es el arroz, es <b>Bacillus cereus</b>: sus esporas sobreviven a la cocción y, si el arroz se queda a temperatura ambiente, germinan y producen una toxina que <b>el recalentado no destruye</b>, porque aguanta el calor</li>
+    <li><b>Enfriarlo deprisa</b>, extendido en una bandeja, y a la nevera <b>antes de una hora</b>. Nunca toda la noche fuera</li>
+    <li>En la nevera, <b>dos o tres días como mucho</b>. Para el resto de la semana, al congelador en porciones: aguanta un mes y va del congelador a la sartén</li>
+    <li>Recalentar <b>una sola vez</b> y que llegue bien caliente por dentro</li>
+    <li><b>Lo bueno:</b> el arroz cocido y enfriado forma almidón resistente por retrogradación. Eso baja la respuesta de glucosa y alimenta a la microbiota, así que para vuestro objetivo el arroz de la víspera es mejor que el recién hecho</li></ul></div>
+  <div class="card ok"><h4>Lo decidido</h4><p class="sub">Vasito, y se acabó el problema</p><ul>
+    <li><b>Vasito de basmati blanco o de integral corriente</b>, el que haya. Con vasito y medio a la semana la diferencia entre uno y otro es irrelevante</li>
+    <li>El vasito viene pasteurizado y cerrado aguanta meses, así que <b>nada de lo de la tarjeta anterior os afecta</b>: ni enfriar en una hora, ni contar días en la nevera, ni congelar raciones</li>
+    <li><b>Son 125 g por vasito.</b> Uno entero para él y medio para ella. El medio que sobra, tapado en la nevera, se gasta en dos días</li>
+    <li>Calentarlo en sartén con un hilo de aceite, como hacéis, es mejor que el microondas: suelta el grano y lo tuesta un poco</li>
+    <li>Lo mismo vale para la quinoa: <b>vasito de 125 g</b>, blanca o roja, y así el domingo no hay que cocer nada</li></ul></div>
+</div>
+
+<h2 class="sec">El postre del mediodía</h2>
+<p class="lede">Una onza de chocolate negro al 85 %, unos 10 g por persona, después de comer. A efectos del plan sale casi gratis: poco más de un gramo de hidratos netos y unos cinco de grasa, casi toda manteca de cacao. En la compra son 140 g a la semana entre los dos, unas seis tabletas al mes.</p>
+
+<h2 class="sec">Equivalencias de almidón</h2>
+<p class="lede">Todas aportan la misma carga de hidrato y son intercambiables. El boniato entra donde el menú diga patata, arroz o quinoa, siempre para los dos a la vez.</p>
+<div class="scroller"><table class="data">
+<thead><tr><th>Alimento</th><th>Ración completa</th><th>Ración corta</th></tr></thead>
+<tbody>
+<tr><td><b>Boniato asado</b></td><td class="n">180 g</td><td class="n">90 g</td></tr>
+<tr><td>Patata cocida</td><td class="n">200 g</td><td class="n">100 g</td></tr>
+<tr><td>Quinoa de vasito</td><td class="n">uno · 125 g</td><td class="n">medio · 62 g</td></tr>
+<tr><td>Arroz de vasito</td><td class="n">uno · 125 g</td><td class="n">medio · 62 g</td></tr>
+<tr><td>Garbanzo cocido, el del hummus</td><td class="n">150 g</td><td class="n">70 g</td></tr>
+<tr><td>Habichuela cocida</td><td class="n">180 g</td><td class="n">90 g</td></tr>
+</tbody></table></div>
+
+<h2 class="sec">La fruta que entra</h2>
+<p class="lede">Criterio keto estricto. Fuera quedan plátano, mango, uva, pera, cereza, manzana, kiwi y cítricos de mesa: una sola pieza se lleva por delante un tercio del cupo diario.</p>
+<div class="scroller"><table class="data">
+<thead><tr><th>Fruta</th><th>HC netos / 100 g</th><th>Ración</th><th>Aporta</th></tr></thead>
+<tbody>
+<tr><td>Aguacate</td><td class="n">1,8 g</td><td class="n">medio</td><td class="n">1,8 g</td></tr>
+<tr><td>Aceituna</td><td class="n">3,1 g</td><td class="n">40 g</td><td class="n">1,2 g</td></tr>
+<tr><td>Mora</td><td class="n">4,3 g</td><td class="n">100 g</td><td class="n">4,3 g</td></tr>
+<tr><td>Frambuesa</td><td class="n">5,4 g</td><td class="n">100 g</td><td class="n">5,4 g</td></tr>
+<tr><td>Fresa</td><td class="n">5,7 g</td><td class="n">150 g</td><td class="n">8,6 g</td></tr>
+<tr><td>Coco sin azúcar</td><td class="n">6,2 g</td><td class="n">30 g</td><td class="n">1,9 g</td></tr>
+<tr><td>Limón y lima</td><td class="n">6,5 g</td><td class="n">zumo</td><td class="n">≈ 1 g</td></tr>
+<tr><td>Arándano</td><td class="n">12,1 g</td><td class="n">60 g</td><td class="n">7,3 g</td></tr>
+</tbody></table></div>
+<div class="cols">
+  <div class="card no"><h4>Dónde está el margen de verdad</h4><ul>
+    <li>Retirar la manzana y la naranja ahorra unos <b>21 g</b> de hidratos netos al día.</li>
+    <li>Los 90 g de lenteja seca del miércoles aportan <b>45 g</b>. El boniato del jueves, <b>36 g</b>. El hummus del lunes, <b>33 g</b>.</li>
+    <li>La fruta retirada pesa menos de la mitad que un solo plato de cuchara. Si el objetivo es entrar en cetosis, el margen está en el almidón.</li>
+    <li><b>Recomendación: no tocar los guisos.</b> Sostienen la fibra fermentable del plan y encajan con los días de entrenamiento. Seguirá siendo una dieta baja en hidratos bien construida, aunque no sea cetosis estricta.</li></ul></div>
+</div>
+
+<h2 class="sec">Rotación de proteínas</h2>
+<div class="scroller"><table class="data">
+<thead><tr><th>Hueco</th><th>Opción base</th><th>Alternativas</th></tr></thead>
+<tbody>
+<tr><td><b>Martes</b><br>comida</td><td>Entrecot 230 / 150 g</td><td>Hamburguesa de vuestra propia picada, o solomillo de cerdo, 240 / 160 g</td></tr>
+<tr><td><b>Martes</b><br>cena</td><td>Sardinas al horno 240 / 160 g</td><td>Merluza empanada 250 / 180 g, para los dos. La ración es más larga porque el rebozado ocupa peso</td></tr>
+<tr><td><b>Jueves</b><br>comida</td><td>Salmón 210 / 150 g</td><td>Trucha asalmonada, mismo gramaje</td></tr>
+<tr><td><b>Viernes</b><br>comida</td><td>Dorada 220 / 160 g</td><td>Lubina, mismo gramaje. Mejillones al vapor, 1,4 kg en concha</td></tr>
+<tr><td><b>Viernes</b><br>pizza</td><td>Bacon y atún</td><td>Jamón serrano en lugar del bacon, o anchoa en lugar del atún</td></tr>
+<tr><td><b>Cenas de huevo</b></td><td>Huevos con claras de bote</td><td>No hay sustituto: sin las claras no salen los macros</td></tr>
+<tr><td><b>Guiso del sábado</b></td><td>Cocido, semanas impares</td><td>Arroz y habichuelas, semanas pares</td></tr>
+</tbody></table></div>
+`;
+
+/* ============ ESTADO Y PERSISTENCIA ============ */
+const DEFAULT = { checked:{}, super:{}, precios:{}, semana:0 };
+let estado = JSON.parse(JSON.stringify(DEFAULT));
+
+function statusMsg(t){ const e=document.getElementById('cstatus'); if(e){ e.textContent=t; if(t) setTimeout(()=>{ if(e.textContent===t) e.textContent=''; },2500);} }
+
+const SYNC = {
+  url:  '',                        // <-- pega aqui la URL de tu base de datos
+  sala: 'casa-gandia'              // <-- cambia esto por algo solo vuestro
+};
+
+const base = () => SYNC.url.replace(/\/+$/,'') + '/' + SYNC.sala;
+let escribiendo = null, conectado = false;
+
+function guardarLocal(){ try{ localStorage.setItem('planificador', JSON.stringify(estado)); }catch(e){} }
+function sincEstado(txt){ const e = document.getElementById('sincst'); if(e) e.textContent = txt; }
+
+async function enviar(ruta, dato, metodo){
+  if(!SYNC.url) return false;
+  try{
+    const r = await fetch(base() + ruta + '.json', {
+      method: metodo || 'PATCH',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(dato)
+    });
+    if(!r.ok) throw new Error(r.status);
+    conectado = true; sincEstado('Al dia');
+    return true;
+  }catch(err){ conectado = false; sincEstado('Sin conexion, guardado solo aqui'); return false; }
+}
+
+function marcarCasilla(id, on){
+  if(on) estado.checked[id]=true; else delete estado.checked[id];
+  guardarLocal();
+  enviar('/checked/' + id, on ? true : null, 'PUT');
+}
+
+function guardar(){
+  guardarLocal();
+  if(!SYNC.url){ statusMsg('Guardado en este dispositivo'); return; }
+  clearTimeout(escribiendo);
+  escribiendo = setTimeout(()=>{
+    enviar('', {checked:estado.checked, super:estado.super, precios:estado.precios, semana:estado.semana}, 'PATCH');
+  }, 400);
+}
+
+function aplicarEstado(){
+  document.querySelectorAll('#vlista input[type=checkbox]').forEach(cb=>{
+    const on = !!estado.checked[cb.dataset.id];
+    cb.checked = on;
+    cb.closest('.item').classList.toggle('done', on);
+  });
+  document.querySelectorAll('#vlista select').forEach(sel=>{
+    const v = estado.super[sel.dataset.id] || '';
+    sel.value = v; sel.dataset.set = v ? '1' : '0';
+  });
+  document.querySelectorAll('.price').forEach(inp=>{
+    const v = estado.precios[inp.dataset.cat];
+    inp.value = (v===undefined||v===null||v==='') ? '' : v;
+  });
+  contarCat(); pintarSupers(); calcularGasto(); pintarSemana();
+}
+
+function normaliza(){
+  estado.checked = estado.checked || {};
+  estado.super   = estado.super   || {};
+  estado.precios = estado.precios || {};
+  estado.semana  = estado.semana  || 0;
+}
+
+(function(){
+  try{ const g = localStorage.getItem('planificador'); if(g) estado = Object.assign({}, DEFAULT, JSON.parse(g)); }catch(e){}
+  normaliza();
+})();
+
+function escuchar(){
+  if(!SYNC.url) { sincEstado('Sin sincronizar'); return; }
+  let es;
+  try{ es = new EventSource(base() + '.json'); }
+  catch(e){ sincEstado('Sin escucha en vivo'); return; }
+  const aplicar = (tipo) => (msg) => {
+    if(!msg.data || msg.data === 'null') return;
+    let d; try{ d = JSON.parse(msg.data); }catch(e){ return; }
+    if(!d || typeof d !== 'object' || !('path' in d)) return;
+    const trozos = d.path === '/' ? [] : d.path.replace(/^\//,'').split('/');
+    if(trozos.length === 0){
+      estado = Object.assign({}, DEFAULT, d.data || {});
+    } else {
+      let obj = estado;
+      for(let i=0; i<trozos.length-1; i++){
+        if(typeof obj[trozos[i]] !== 'object' || obj[trozos[i]] === null) obj[trozos[i]] = {};
+        obj = obj[trozos[i]];
+      }
+      const k = trozos[trozos.length-1];
+      if(tipo === 'put'){ if(d.data === null) delete obj[k]; else obj[k] = d.data; }
+      else {
+        if(typeof obj[k] !== 'object' || obj[k] === null) obj[k] = {};
+        for(const kk in d.data){ if(d.data[kk] === null) delete obj[k][kk]; else obj[k][kk] = d.data[kk]; }
+      }
+    }
+    normaliza(); guardarLocal(); aplicarEstado();
+    conectado = true; sincEstado('Al dia');
+  };
+  es.addEventListener('put',   aplicar('put'));
+  es.addEventListener('patch', aplicar('patch'));
+  es.addEventListener('open',  ()=>{ conectado = true; sincEstado('Al dia'); });
+  es.onerror = ()=>{ conectado = false; sincEstado('Reconectando...'); };
+}
+
+/* ============ RENDER ============ */
+const NOM = {pez:'Pescado', carne:'Carne', huevo:'Huevo'};
+const etiq = t => t ? `<span class="pill ${t}">${NOM[t]||t}</span>` : '';
+
+function pintarCuadrante(){
+  document.getElementById('cuadbody').innerHTML = CUAD.map(r=>`
+    <tr>
+      <th>${r[0]}<span>${r[1]}</span></th>
+      <td><b>${r[2]}</b>${etiq(r[3])}${r[4]?`<div class="note" style="margin-top:4px">${r[4]}</div>`:''}</td>
+      <td><b>${r[5]}</b>${etiq(r[6])}${r[7]?`<div class="note" style="margin-top:4px">${r[7]}</div>`:''}</td>
+    </tr>`).join('');
+}
+
+function bloqueComida(m, etiqueta){
+  const ET = {pescado:['pez','Pescado'], carne:['carne','Carne'], huevo:['huevo','Huevo']};
+  const e = ET[m.tipo];
+  const tipo = e ? `<em class="${e[0]}">${e[1]}</em>` : '<em>Libre</em>';
+  return `<div class="meal">
+    <div class="slot">${etiqueta}${tipo}</div>
+    <div>
+      <p class="dish">${m.plato}</p>
+      <p class="detail">${m.det}</p>
+      ${m.alm?`<p class="starch ${m.alm[0]}">${m.alm[1]}</p>`:''}
+      ${m.nota?`<p class="note">${m.nota}</p>`:''}
+      <div class="prot">
+        <span class="pchip">Él <strong>${m.p[0]} g</strong></span>
+        <span class="pchip">Ella <strong>${m.p[1]} g</strong></span>
+        ${m.t?`<span class="pchip">${m.t}</span>`:''}
+      </div>
+    </div>
+  </div>`;
+}
+
+function pintarDias(){
+  document.getElementById('dias').innerHTML = DIAS.map(d=>`
+    <article class="day">
+      <div class="day-head"><h3>${d.d}</h3>${d.ent.map(e=>`<span class="tag ${e[0]}">${e[1]}</span>`).join('')}</div>
+      ${bloqueComida(d.comida,'Comida')}
+      ${bloqueComida(d.cena,'Cena')}
+    </article>`).join('');
+}
+
+function pintarCompra(){
+  const opts = it => `<select data-id="${it[0]}" data-set="${estado.super[it[0]]?1:0}">
+      <option value="">— supermercado</option>
+      ${SUPERS.map(sp=>`<option value="${sp.id}"${estado.super[it[0]]===sp.id?' selected':''}>${sp.n}</option>`).join('')}
+    </select>`;
+
+  const bloque = lista => LISTAS[lista].map((c,i)=>`
+    <section class="cat" data-cat="${lista}-${i}">
+      <div class="cat-head"><h3>${c.cat}</h3><span class="cnt" data-cnt="${lista}-${i}"></span></div>
+      ${c.items.map(it=>`
+        <div class="item" data-item="${it[0]}">
+          <input type="checkbox" id="chk-${it[0]}" data-id="${it[0]}">
+          <label for="chk-${it[0]}">${it[1]}${it[3]?`<span class="why">${it[3]}</span>`:''}</label>
+          <span class="qty">${it[2]}</span>
+          ${opts(it)}
+        </div>`).join('')}
+      ${c.nota?`<p class="alt">${c.nota}</p>`:''}
+    </section>`).join('');
+
+  document.getElementById('vlista').innerHTML =
+    `<div data-lista="mensual">${bloque('mensual')}</div>` +
+    `<div data-lista="semanal" hidden>${bloque('semanal')}</div>`;
+
+  document.querySelectorAll('#vlista input[type=checkbox]').forEach(cb=>{
+    cb.addEventListener('change', ()=>{
+      marcarCasilla(cb.dataset.id, cb.checked);
+      cb.closest('.item').classList.toggle('done', cb.checked);
+      contarCat(); pintarSupers();
+    });
+  });
+  document.querySelectorAll('#vlista select').forEach(sel=>{
+    sel.addEventListener('change', ()=>{
+      const v = sel.value;
+      if(v) estado.super[sel.dataset.id]=v; else delete estado.super[sel.dataset.id];
+      sel.dataset.set = v ? '1' : '0';
+      pintarSupers(); calcularGasto(); guardar();
+    });
+  });
+}
+
+function contarCat(){
+  ['mensual','semanal'].forEach(lista=>{
+    LISTAS[lista].forEach((c,i)=>{
+      const hechos = c.items.filter(it=>estado.checked[it[0]]).length;
+      const e = document.querySelector(`[data-cnt="${lista}-${i}"]`);
+      if(e) e.textContent = `${hechos} / ${c.items.length}`;
+    });
+  });
+}
+
+function itemsDe(supId){
+  const out = {mensual:[], semanal:[]};
+  ['mensual','semanal'].forEach(lista=>{
+    LISTAS[lista].forEach(c=>c.items.forEach(it=>{
+      if(estado.super[it[0]]===supId) out[lista].push(it);
+    }));
+  });
+  return out;
+}
+
+function textoSuper(sp){
+  const g = itemsDe(sp.id);
+  let t = sp.n.toUpperCase() + '\n';
+  ['mensual','semanal'].forEach(lista=>{
+    const pend = g[lista].filter(it=>!estado.checked[it[0]]);
+    if(!pend.length) return;
+    t += '\n' + (lista==='mensual' ? 'Compra del mes' : 'Compra de la semana') + '\n';
+    t += pend.map(it=>`- ${it[1]}: ${it[2]}`).join('\n') + '\n';
+  });
+  return t.trim();
+}
+
+async function copiar(txt, msg){
+  try{ await navigator.clipboard.writeText(txt); statusMsg(msg); }
+  catch(e){
+    const ta=document.createElement('textarea'); ta.value=txt; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); statusMsg(msg); }catch(e2){ statusMsg('No se pudo copiar'); }
+    ta.remove();
+  }
+}
+
+function pintarSupers(){
+  const cont = document.getElementById('vsuper');
+  const usados = SUPERS.filter(sp=>Object.values(estado.super).includes(sp.id));
+  const sinAsignar = TODOS.flatMap(c=>c.items).filter(it=>!estado.super[it[0]]);
+
+  let html = '';
+  if(!usados.length){
+    html += `<div class="empty">Todavía no habéis asignado ningún artículo. Volved a <b>Mensual</b> o <b>Semanal</b> y elegid el supermercado de cada uno: aquí se irán agrupando solos.</div>`;
+  }
+
+  usados.forEach(sp=>{
+    const g = itemsDe(sp.id);
+    const todos = g.mensual.concat(g.semanal);
+    const hechos = todos.filter(it=>estado.checked[it[0]]).length;
+    html += `<section class="superblk">
+      <div class="sh"><h3>${sp.n}</h3><span class="cnt">${hechos} / ${todos.length}</span></div>`;
+    ['mensual','semanal'].forEach(lista=>{
+      if(!g[lista].length) return;
+      html += `<p class="grp">${lista==='mensual'?'Compra del mes':'Compra de la semana'}</p>`;
+      html += g[lista].map(it=>`
+        <div class="li ${estado.checked[it[0]]?'done':''}">
+          <input type="checkbox" id="s-${it[0]}" data-id="${it[0]}" ${estado.checked[it[0]]?'checked':''}>
+          <label for="s-${it[0]}">${it[1]}</label>
+          <span class="qty">${it[2]}</span>
+        </div>`).join('');
+    });
+    html += `<div class="sf">
+        <button class="btn pri" data-copy="${sp.id}">Copiar para WhatsApp</button>
+        <button class="btn" data-wa="${sp.id}">Abrir WhatsApp</button>
+      </div></section>`;
+  });
+
+  if(sinAsignar.length){
+    html += `<section class="superblk" style="border-style:dashed">
+      <div class="sh"><h3>Sin asignar</h3><span class="cnt">${sinAsignar.length}</span></div>
+      ${sinAsignar.map(it=>`<div class="li"><span></span><label>${it[1]}</label><span class="qty">${it[2]}</span></div>`).join('')}
+      <p class="alt">Elegid supermercado para estos y pasarán al bloque que les toque.</p>
+    </section>`;
+  }
+
+  if(usados.length){
+    html += `<div class="row" style="margin-top:16px"><button class="btn" id="copytodo">Copiar la lista entera, por supermercados</button></div>`;
+  }
+
+  cont.innerHTML = html;
+
+  cont.querySelectorAll('input[type=checkbox]').forEach(cb=>{
+    cb.addEventListener('change', ()=>{
+      marcarCasilla(cb.dataset.id, cb.checked);
+      const otro = document.getElementById('chk-'+cb.dataset.id);
+      if(otro){ otro.checked = cb.checked; otro.closest('.item').classList.toggle('done', cb.checked); }
+      cb.closest('.li').classList.toggle('done', cb.checked);
+      contarCat();
+    });
+  });
+  cont.querySelectorAll('[data-copy]').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      const sp = SUPERS.find(x=>x.id===b.dataset.copy);
+      copiar(textoSuper(sp), 'Lista de ' + sp.n + ' copiada');
+    });
+  });
+  cont.querySelectorAll('[data-wa]').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      const sp = SUPERS.find(x=>x.id===b.dataset.wa);
+      window.open('https://wa.me/?text=' + encodeURIComponent(textoSuper(sp)), '_blank', 'noopener');
+    });
+  });
+  const ct = document.getElementById('copytodo');
+  if(ct) ct.addEventListener('click', ()=>{
+    const t = usados.map(sp=>textoSuper(sp)).filter(Boolean).join('\n\n————————\n\n');
+    copiar(t, 'Lista completa copiada');
+  });
+}
+
+
+function eur(n){ return n.toLocaleString('es-ES',{minimumFractionDigits:0,maximumFractionDigits:0}) + ' €'; }
+
+function pintarEstimacion(){
+  const sum = b => b.reduce((a,c)=>a + c.items.reduce((x,i)=>x+i[2],0), 0);
+  const mes = sum(COSTES.mensual);
+  const sem = sum(COSTES.semanal);
+  const supl = COSTES.mensual.filter(c=>c.cat==='Suplementos').reduce((a,c)=>a+c.items.reduce((x,i)=>x+i[2],0),0);
+  const totalMes = mes + sem*4;
+
+  const f = document.getElementById('estfigs');
+  if(f) f.innerHTML = `
+    <div><dt>Compra semanal</dt><dd>${eur(sem)}<small>solo lo perecedero</small></dd></div>
+    <div><dt>Compra mensual</dt><dd>${eur(mes)}<small>congelador, conservas y despensa</small></dd></div>
+    <div><dt>Total al mes</dt><dd>${eur(totalMes)}<small>mensual + cuatro semanales</small></dd></div>
+    <div><dt>Sin suplementos</dt><dd>${eur(totalMes-supl)}<small>solo comida</small></dd></div>
+    <div><dt>Por persona y día</dt><dd>${(totalMes/2/30).toFixed(2).replace('.',',')} €<small>tres comidas, todo incluido</small></dd></div>`;
+
+  const bloque = (titulo, b, mult) => {
+    const t = b.reduce((a,c)=>a+c.items.reduce((x,i)=>x+i[2],0),0);
+    return `<tbody><tr><th colspan="3" style="background:var(--surface-3);font-family:var(--f-display);font-size:1rem">${titulo}</th></tr>` +
+      b.map(c=>{
+        const s = c.items.reduce((x,i)=>x+i[2],0);
+        return `<tr><td><b>${c.cat}</b><span class="why" style="display:block;font-size:.76rem;color:var(--muted)">${c.items.map(i=>i[0]).join(' · ')}</span></td>` +
+               `<td class="n" style="text-align:right">${eur(s)}</td>` +
+               `<td class="n" style="text-align:right;color:var(--muted)">${Math.round(s/t*100)} %</td></tr>`;
+      }).join('') +
+      `<tr><td><b>Subtotal</b></td><td class="n" style="text-align:right"><b>${eur(t)}</b></td><td></td></tr></tbody>`;
+  };
+
+  const tb = document.getElementById('testim');
+  if(tb) tb.innerHTML =
+    '<thead><tr><th>Apartado</th><th style="text-align:right">Coste</th><th style="text-align:right">Peso</th></tr></thead>' +
+    bloque('Compra mensual', COSTES.mensual) +
+    bloque('Compra semanal, una semana', COSTES.semanal);
+
+  const n = document.getElementById('estnota');
+  if(n) n.innerHTML = 'Las partidas que más pesan son los suplementos (75 €), los frutos rojos frescos (unos 70 € al mes) y el entrecot (30 €). ' +
+    'Pasar los frutos rojos a congelados ahorra unos 45 € al mes sin cambiar nada del menú, y cambiar la macadamia por avellana o pistacho, unos 8 € más. ' +
+    '<b>Estos precios son órdenes de magnitud</b>, no una lista verificada de ninguna tienda: sirven para saber por dónde anda el presupuesto y para eso están, pero lo que vale es lo que anotéis abajo. ' +
+    'Como referencia, la OCU situó en 320 € la cesta media mensual de un hogar español en mayo de 2026; este menú está por encima porque lleva mucha más proteína animal y fruta roja.';
+}
+
+function pintarGasto(){
+  const t = document.getElementById('tgasto');
+  t.innerHTML = `<thead><tr><th>Supermercado</th><th style="text-align:right">Artículos asignados</th><th style="text-align:right">Coste</th></tr></thead>
+    <tbody>${SUPERS.map(sp=>{
+      const n = Object.values(estado.super).filter(v=>v===sp.id).length;
+      return `<tr><td>${sp.n}</td><td class="num" data-narts="${sp.id}">${n}</td><td class="num"><input class="price" type="number" min="0" step="0.01" inputmode="decimal" data-cat="${sp.id}" placeholder="0,00"> €</td></tr>`;
+    }).join('')}</tbody>
+    <tfoot><tr><td>Total</td><td class="num" id="nartstot"></td><td class="num"><span id="total">0,00</span> €</td></tr></tfoot>`;
+  t.querySelectorAll('.price').forEach(inp=>{
+    inp.addEventListener('input', ()=>{
+      const v = inp.value.trim();
+      if(v==='') delete estado.precios[inp.dataset.cat]; else estado.precios[inp.dataset.cat]=parseFloat(v.replace(',','.'))||0;
+      calcularGasto(); guardar();
+    });
+  });
+}
+
+function calcularGasto(){
+  let total = 0;
+  Object.values(estado.precios).forEach(v=>{ const n=parseFloat(v); if(!isNaN(n)) total+=n; });
+  const e = document.getElementById('total'); if(e) e.textContent = total.toFixed(2).replace('.',',');
+  SUPERS.forEach(sp=>{
+    const c = document.querySelector(`[data-narts="${sp.id}"]`);
+    if(c) c.textContent = Object.values(estado.super).filter(v=>v===sp.id).length;
+  });
+  const nt = document.getElementById('nartstot');
+  if(nt) nt.textContent = Object.keys(estado.super).length + ' de ' + TODOS.reduce((a,c)=>a+c.items.length,0);
+  const f = document.getElementById('figs');
+  if(f) f.innerHTML = `
+    <div><dt>Compra del mes</dt><dd>${total.toFixed(2).replace('.',',')} €<small>Suma de lo que hayáis anotado por tienda</small></dd></div>
+    <div><dt>Por semana</dt><dd>${(total/4).toFixed(2).replace('.',',')} €<small>Repartido en cuatro semanas</small></dd></div>
+    <div><dt>Por persona y día</dt><dd>${(total/56).toFixed(2).replace('.',',')} €<small>Dos personas, veintiocho días</small></dd></div>`;
+}
+
+function pintarSemana(){
+  document.getElementById('wlabel').textContent = estado.semana===0 ? 'Semana impar · cocido' : 'Semana par · arroz y habichuelas';
+}
+
+/* ============ INTERACCIÓN ============ */
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-selected', String(x===t)));
+    const map = { menu:'p-menu', ensaladas:'p-ensaladas', compra:'p-compra', domingo:'p-domingo', sugerencias:'p-sug', gasto:'p-gasto' };
+    Object.entries(map).forEach(([k,id])=>{ document.getElementById(id).hidden = (k!==t.dataset.tab); });
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+});
+
+document.getElementById('wprev').addEventListener('click', ()=>{ estado.semana = estado.semana===0?1:0; pintarSemana(); guardar(); });
+document.getElementById('wnext').addEventListener('click', ()=>{ estado.semana = estado.semana===0?1:0; pintarSemana(); guardar(); });
+document.getElementById('btnprint').addEventListener('click', ()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-selected', String(x.dataset.tab==='menu')));
+  document.getElementById('p-menu').hidden=false;
+  ['p-ensaladas','p-compra','p-domingo','p-sug','p-gasto'].forEach(id=>document.getElementById(id).hidden=true);
+  setTimeout(()=>window.print(), 60);
+});
+
+document.getElementById('btnclear').addEventListener('click', ()=>{
+  estado.checked = {};
+  document.querySelectorAll('input[type=checkbox]').forEach(cb=>{ cb.checked=false; const c=cb.closest('.item')||cb.closest('.li'); if(c) c.classList.remove('done'); });
+  contarCat(); pintarSupers(); guardarLocal();
+  if(SYNC.url) enviar('/checked', null, 'PUT');
+  statusMsg('Lista vaciada');
+});
+
+document.getElementById('btnexp').addEventListener('click', ()=>{
+  copiar(JSON.stringify({super:estado.super, precios:estado.precios}),
+         'Ajustes copiados. Pégalos en el otro móvil con «Pegar ajustes»');
+});
+
+document.getElementById('btnimp').addEventListener('click', ()=>{
+  const t = prompt('Pega aquí los ajustes que has copiado del otro móvil:');
+  if(!t) return;
+  try{
+    const d = JSON.parse(t);
+    if(d.super) estado.super = d.super;
+    if(d.precios) estado.precios = d.precios;
+    aplicarEstado(); guardar(); statusMsg('Ajustes importados');
+  }catch(e){ statusMsg('Eso no parece un texto de ajustes'); }
+});
+
+document.querySelectorAll('.seg').forEach(b=>{
+  b.addEventListener('click', ()=>{
+    document.querySelectorAll('.seg').forEach(x=>x.setAttribute('aria-pressed', String(x===b)));
+    const v = b.dataset.lista;
+    document.getElementById('vlista').hidden = (v==='super');
+    document.getElementById('vsuper').hidden = (v!=='super');
+    document.querySelectorAll('#vlista > div[data-lista]').forEach(d=>{ d.hidden = (d.dataset.lista!==v); });
+  });
+});
+
+
+pintarCuadrante(); pintarDias(); pintarCompra(); pintarGasto(); pintarEstimacion();
+document.getElementById('sug').innerHTML = SUG;
+document.getElementById('batch').innerHTML = BATCH;
+document.getElementById('ensaladas').innerHTML = ENSALADAS;
+aplicarEstado();
+escuchar();
+</script>
+</body>
+</html>
